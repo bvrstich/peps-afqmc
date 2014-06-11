@@ -24,11 +24,17 @@ int main(int argc,char *argv[]){
    int d = atoi(argv[2]);
    int D = atoi(argv[3]);
 
+   //initialize some statics dimensions
+   Global::lat.set(L,L,d);
+
    //read in the trial state
    char filename[200];
-   sprintf(filename,"input/%dx%d/D=%d.mps",L,L,D);
+   sprintf(filename,"input/%dx%d/D=%d",L,L,D);
 
-   //intialize some storage
+   PEPS< double > peps;
+   peps.load(filename);
+
+   cout << peps << endl;
 
    /*
    double dtau = 0.01;
