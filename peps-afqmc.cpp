@@ -23,18 +23,26 @@ int main(int argc,char *argv[]){
    int L = atoi(argv[1]);
    int d = atoi(argv[2]);
    int D = atoi(argv[3]);
+   int D_aux = atoi(argv[4]);
 
-   //initialize some statics dimensions
+   //initialize the dimensions of the problem
    Global::lat.set(L,L,d);
+
+   //and some static objects
+   Environment::init(D,D_aux);
 
    //read in the trial state
    char filename[200];
    sprintf(filename,"input/%dx%d/D=%d",L,L,D);
 
-   PEPS< double > peps;
+   PEPS< complex<double> > peps;
    peps.load(filename);
 
-   cout << peps << endl;
+   Walker walker(10);
+
+   Environment::calc_env('B',peps,walker);
+
+   Environment::test_env();
 
    /*
    double dtau = 0.01;

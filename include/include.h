@@ -10,3 +10,10 @@
 #include "Global.h"
 
 #include "PEPS.h"
+#include "Walker.h"
+
+#include "MPO.h"
+#include "MPS.h"
+
+#include "Environment.h"
+#include "compress.h"

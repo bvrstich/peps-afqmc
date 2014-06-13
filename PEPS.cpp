@@ -34,39 +34,39 @@ PEPS<T>::PEPS(int D_in) : vector< TArray<T,5> >(Global::lat.gLx() * Global::lat.
    //corners first
 
    //r == 0 : c == 0
-   (*this)[ Global::lat.grc2i(0,0) ].resize(1,D,d,1,D);
+   (*this)[ Global::lat.grc2i(0,0) ].resize(d,1,D,1,D);
 
    //r == 0 : c == L - 1
-   (*this)[ Global::lat.grc2i(0,Lx-1) ].resize(D,D,d,1,1);
+   (*this)[ Global::lat.grc2i(0,Lx-1) ].resize(d,D,D,1,1);
 
    //r == L - 1 : c == 0
-   (*this)[ Global::lat.grc2i(Ly-1,0) ].resize(1,1,d,D,D);
+   (*this)[ Global::lat.grc2i(Ly-1,0) ].resize(d,1,1,D,D);
 
    //r == L - 1 : c == L - 1
-   (*this)[ Global::lat.grc2i(Ly-1,Lx-1) ].resize(D,1,d,D,1);
+   (*this)[ Global::lat.grc2i(Ly-1,Lx-1) ].resize(d,D,1,D,1);
 
    //sides:
 
    //r == 0
    for(int c = 1;c < Lx - 1;++c)
-      (*this)[ Global::lat.grc2i(0,c) ].resize(D,D,d,1,D);
+      (*this)[ Global::lat.grc2i(0,c) ].resize(d,D,D,1,D);
 
    //r == Ly - 1
    for(int c = 1;c < Lx - 1;++c)
-      (*this)[ Global::lat.grc2i(Ly-1,c) ].resize(D,1,d,D,D);
+      (*this)[ Global::lat.grc2i(Ly-1,c) ].resize(d,D,1,D,D);
 
    //c == 0
    for(int r = 1;r < Ly - 1;++r)
-      (*this)[ Global::lat.grc2i(r,0) ].resize(1,D,d,D,D);
+      (*this)[ Global::lat.grc2i(r,0) ].resize(d,1,D,D,D);
 
    //c == Lx - 1
    for(int r = 1;r < Ly - 1;++r)
-      (*this)[ Global::lat.grc2i(r,Lx - 1) ].resize(D,D,d,D,1);
+      (*this)[ Global::lat.grc2i(r,Lx - 1) ].resize(d,D,D,D,1);
 
    //the rest is full
    for(int r = 1;r < Ly - 1;++r)
       for(int c = 1;c < Lx - 1;++c)
-         (*this)[ Global::lat.grc2i(r,c) ].resize(D,D,d,D,D);
+         (*this)[ Global::lat.grc2i(r,c) ].resize(d,D,D,D,D);
 
    //now initialize with random numbers
    for(int r = 0;r < Ly;++r)
