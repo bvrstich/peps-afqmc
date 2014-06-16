@@ -26,7 +26,7 @@ int main(int argc,char *argv[]){
    int D_aux = atoi(argv[4]);
 
    //initialize the dimensions of the problem
-   Global::lat.set(L,L,d);
+   Global::init(d,L,L);
 
    //and some static objects
    Environment::init(D,D_aux);
@@ -41,15 +41,16 @@ int main(int argc,char *argv[]){
    Walker walker(10);
 
    Environment::calc_env('A',peps,walker);
-
+   Environment::test_env();
 /*
+   walker.calc_properties('H',peps);
+
    double dtau = 0.01;
    int Nw = 100;
 
    AFQMC afqmc(mps,dtau,Nw);
    afqmc.walk(100);
-   */
-
+*/
    return 0;
 
 }

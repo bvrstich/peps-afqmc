@@ -12,9 +12,56 @@ using std::ofstream;
 
 #include "include.h"
 
-Lattice Global::lat;
+TArray<complex<double>,2> Global::Sx;
+
+TArray<complex<double>,2> Global::Sy;
+
+TArray<complex<double>,2> Global::Sz;
+
+int Global::Lx;
+int Global::Ly;
+
+int Global::d;
 
 Random Global::RN;
+
+/**
+ * @param d_in physical dimension
+ * @param Lx_in x dimension of the square lattice
+ * @param Ly_in y dimension of the square lattice
+ */
+void Global::init(int d_in,int Lx_in,int Ly_in){
+
+   Lx = Lx_in;
+   Ly = Ly_in;
+
+   d = d_in;
+
+   //Sx
+   Sx.resize(d,d);
+
+   Sx(0,0) = complex<double>(0.0,0.0);
+   Sx(0,1) = complex<double>(0.5,0.0);
+   Sx(1,0) = complex<double>(0.5,0.0);
+   Sx(1,1) = complex<double>(0.0,0.0);
+
+   //Sy
+   Sy.resize(d,d);
+
+   Sy(0,0) = complex<double>(0.0,0.0);
+   Sy(0,1) = complex<double>(0.0,0.5);
+   Sy(1,0) = complex<double>(0.0,-0.5);
+   Sy(1,1) = complex<double>(0.0,0.0);
+
+   //Sz
+   Sz.resize(d,d);
+
+   Sz(0,0) = complex<double>(-0.5,0.0);
+   Sz(0,1) = complex<double>(0.0,0.0);
+   Sz(1,0) = complex<double>(0.0,0.0);
+   Sz(1,1) = complex<double>(0.5,0.0);
+
+}
 
 //!function which generates random complex numbers uniformly on a square of side 2
 template<>

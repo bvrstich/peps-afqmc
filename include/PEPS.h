@@ -55,8 +55,8 @@ class PEPS : public vector< TArray<T,5> > {
 template<typename T>
 ostream &operator<<(ostream &output,const PEPS<T> &peps_p){
 
-   for(int r = 0;r < Global::lat.gLy();++r)
-      for(int c = 0;c < Global::lat.gLx();++c){
+   for(int r = 0;r < Global::Ly;++r)
+      for(int c = 0;c < Global::Lx;++c){
 
          output << std::endl;
          output << "Tensor on site (" << r << "," << c << ")\t" << std::endl;

@@ -15,7 +15,7 @@ using std::ofstream;
 /** 
  * empty constructor: just sets the length of the vector
  */
-MPS::MPS() : vector< TArray<complex<double>,3> >( Global::lat.gLx() ) { }
+MPS::MPS() : vector< TArray<complex<double>,3> >( Global::Lx ) { }
 
 /** 
  * standard constructor: just takes in
@@ -23,9 +23,9 @@ MPS::MPS() : vector< TArray<complex<double>,3> >( Global::lat.gLx() ) { }
  * @param D_in virtual max bond dimension
  * allocates the tensors and fills them randomly
  */
-MPS::MPS(int D_in) : vector< TArray<complex<double>,3> >( Global::lat.gLx() ) {
+MPS::MPS(int D_in) : vector< TArray<complex<double>,3> >( Global::Lx ) {
 
-   int Lx = Global::lat.gLx();
+   int Lx = Global::Lx;
 
    this->D = D_in;
 
@@ -59,10 +59,10 @@ MPS::~MPS(){ }
  */
 void MPS::fill(char option,const PEPS< complex<double> > &peps,const Walker &walker) {
 
-   int Lx = Global::lat.gLx();
-   int Ly = Global::lat.gLy();
+   int Lx = Global::Lx;
+   int Ly = Global::Ly;
 
-   int d = Global::lat.gd();
+   int d = Global::d;
 
    complex<double> one(1.0,0.0);
    complex<double> zero(0.0,0.0);
@@ -230,16 +230,17 @@ void MPS::gemv(char uplo,const MPO &mpo){
  * @param dir Left or Right canonicalization
  * @param norm if true: normalize, else not
  */
- /*
-template<typename T>
-void MPS<T>::canonicalize(const BTAS_SIDE &dir,bool norm){
+void MPS::canonicalize(const BTAS_SIDE &dir,bool norm){
 
    int length = this->size();
 
+   complex<double> one(1.0,0.0);
+   complex<double> zero(0.0,0.0);
+
    if(dir == Left){//QR
 
-      TArray<T,2> R;
-      TArray<T,3> tmp;
+      TArray<complex<double>,2> R;
+      TArray<complex<double>,3> tmp;
 
       for(int i = 0;i < length - 1;++i){
 
@@ -251,7 +252,7 @@ void MPS<T>::canonicalize(const BTAS_SIDE &dir,bool norm){
          //paste to next matrix
          tmp.clear();
 
-         Contract((T)1.0,R,shape(1),(*this)[i + 1],shape(0),(T)0.0,tmp);
+         Contract(one,R,shape(1),(*this)[i + 1],shape(0),zero,tmp);
 
          (*this)[i + 1] = std::move(tmp);
 
@@ -259,7 +260,7 @@ void MPS<T>::canonicalize(const BTAS_SIDE &dir,bool norm){
 
       if(norm){
 
-         T nrm = sqrt(Dotc((*this)[length-1],(*this)[length-1]));
+         complex<double> nrm = sqrt(Dotc((*this)[length-1],(*this)[length-1]));
          Scal(1.0/nrm,(*this)[length-1]);
 
       }
@@ -267,8 +268,8 @@ void MPS<T>::canonicalize(const BTAS_SIDE &dir,bool norm){
    }
    else{//LQ
 
-      TArray<T,2> L;
-      TArray<T,3> tmp;
+      TArray<complex<double>,2> L;
+      TArray<complex<double>,3> tmp;
 
       for(int i = length - 1;i > 0;--i){
 
@@ -280,7 +281,7 @@ void MPS<T>::canonicalize(const BTAS_SIDE &dir,bool norm){
          //paste to previous matrix
          tmp.clear();
 
-         Contract((T)1.0,(*this)[i - 1],shape(2),L,shape(0),(T)0.0,tmp);
+         Contract(one,(*this)[i - 1],shape(2),L,shape(0),zero,tmp);
 
          (*this)[i - 1] = std::move(tmp);
 
@@ -288,7 +289,7 @@ void MPS<T>::canonicalize(const BTAS_SIDE &dir,bool norm){
 
       if(norm){
 
-         T nrm = sqrt(Dotc((*this)[0],(*this)[0]));
+         complex<double> nrm = sqrt(Dotc((*this)[0],(*this)[0]));
          Scal(1.0/nrm,(*this)[0]);
 
       }
@@ -296,7 +297,7 @@ void MPS<T>::canonicalize(const BTAS_SIDE &dir,bool norm){
    }
 
 }
-*/
+
 /**
  * find an approximate form of the state 'mps' compressed to a bond dimension 'Dc' by performing an SVD on an non-canonical state.
  * @param dir Left or Right - going compression

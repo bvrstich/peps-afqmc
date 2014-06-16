@@ -16,66 +16,66 @@ using std::ofstream;
  * construct an empty PEPS object, note: be sure to initialize the Lattice object before calling the constructor
  */
 template<typename T>
-PEPS<T>::PEPS() : vector< TArray<T,5> >(Global::lat.gLx() * Global::lat.gLy()) { }
+PEPS<T>::PEPS() : vector< TArray<T,5> >(Global::Lx * Global::Ly) { }
 
 /**
  * construct constructs a standard PEPS object, note: be sure to initialize the Lattice object before calling the constructor
  * @param D_in cutoff virtual dimension
  */
 template<typename T>
-PEPS<T>::PEPS(int D_in) : vector< TArray<T,5> >(Global::lat.gLx() * Global::lat.gLy()) {
+PEPS<T>::PEPS(int D_in) : vector< TArray<T,5> >(Global::Lx * Global::Ly) {
 
    D = D_in;
 
-   int Lx = Global::lat.gLx();
-   int Ly = Global::lat.gLy();
-   int d = Global::lat.gd();
+   int Lx = Global::Lx;
+   int Ly = Global::Ly;
+   int d = Global::d;
 
    //corners first
 
    //r == 0 : c == 0
-   (*this)[ Global::lat.grc2i(0,0) ].resize(d,1,D,1,D);
+   (*this)[ 0 ].resize(d,1,D,1,D);
 
    //r == 0 : c == L - 1
-   (*this)[ Global::lat.grc2i(0,Lx-1) ].resize(d,D,D,1,1);
+   (*this)[ Lx - 1 ].resize(d,D,D,1,1);
 
    //r == L - 1 : c == 0
-   (*this)[ Global::lat.grc2i(Ly-1,0) ].resize(d,1,1,D,D);
+   (*this)[ (Ly-1)*Lx ].resize(d,1,1,D,D);
 
    //r == L - 1 : c == L - 1
-   (*this)[ Global::lat.grc2i(Ly-1,Lx-1) ].resize(d,D,1,D,1);
+   (*this)[ (Ly-1)*Lx + Lx - 1 ].resize(d,D,1,D,1);
 
    //sides:
 
    //r == 0
    for(int c = 1;c < Lx - 1;++c)
-      (*this)[ Global::lat.grc2i(0,c) ].resize(d,D,D,1,D);
+      (*this)[ c ].resize(d,D,D,1,D);
 
    //r == Ly - 1
    for(int c = 1;c < Lx - 1;++c)
-      (*this)[ Global::lat.grc2i(Ly-1,c) ].resize(d,D,1,D,D);
+      (*this)[ (Ly-1)*Lx + c ].resize(d,D,1,D,D);
 
    //c == 0
    for(int r = 1;r < Ly - 1;++r)
-      (*this)[ Global::lat.grc2i(r,0) ].resize(d,1,D,D,D);
+      (*this)[ r*Lx ].resize(d,1,D,D,D);
 
    //c == Lx - 1
    for(int r = 1;r < Ly - 1;++r)
-      (*this)[ Global::lat.grc2i(r,Lx - 1) ].resize(d,D,D,D,1);
+      (*this)[ r*Lx + Lx - 1 ].resize(d,D,D,D,1);
 
    //the rest is full
    for(int r = 1;r < Ly - 1;++r)
       for(int c = 1;c < Lx - 1;++c)
-         (*this)[ Global::lat.grc2i(r,c) ].resize(d,D,D,D,D);
+         (*this)[ r*Lx + c ].resize(d,D,D,D,D);
 
    //now initialize with random numbers
    for(int r = 0;r < Ly;++r)
       for(int c = 0;c < Lx;++c){
 
-         (*this)[ Global::lat.grc2i(r,c) ].generate(Global::rgen<T>);
+         (*this)[ r*Lx + c ].generate(Global::rgen<T>);
 
-         Normalize((*this)[ Global::lat.grc2i(r,c) ]);
-         Scal((T)D,(*this)[ Global::lat.grc2i(r,c) ]);
+         Normalize((*this)[ r*Lx + c ]);
+         Scal((T)D,(*this)[ r*Lx + c ]);
 
       }
 
@@ -106,7 +106,7 @@ PEPS<T>::~PEPS(){ }
 template<typename T>
 const TArray<T,5> &PEPS<T>::operator()(int r,int c) const {
 
-   return (*this)[Global::lat.grc2i(r,c)];
+   return (*this)[r*Global::Lx + c];
 
 }
 
@@ -119,7 +119,7 @@ const TArray<T,5> &PEPS<T>::operator()(int r,int c) const {
 template<typename T>
 TArray<T,5> &PEPS<T>::operator()(int r,int c) {
 
-   return (*this)[Global::lat.grc2i(r,c)];
+   return (*this)[r*Global::Lx + c];
 
 }
 
@@ -151,8 +151,8 @@ void PEPS<T>::sD(int D_in){
 template<typename T>
 void PEPS<T>::load(const char *filename){
 
-   int Lx = Global::lat.gLx();
-   int Ly = Global::lat.gLy();
+   int Lx = Global::Lx;
+   int Ly = Global::Ly;
 
    for(int row = 0;row < Ly;++row)
       for(int col = 0;col < Lx;++col){

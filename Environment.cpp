@@ -31,8 +31,8 @@ void Environment::init(int D,int D_aux_in){
 
    D_aux = D_aux_in;
 
-   int Lx = Global::lat.gLx();
-   int Ly = Global::lat.gLy();
+   int Lx = Global::Lx;
+   int Ly = Global::Ly;
 
    t.resize(Ly - 1);
    b.resize(Ly - 1);
@@ -82,10 +82,10 @@ void Environment::init(int D,int D_aux_in){
  */
 void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const Walker &walker){
 
-   int Lx = Global::lat.gLx();
-   int Ly = Global::lat.gLy();
+   int Lx = Global::Lx;
+   int Ly = Global::Ly;
 
-   int d = Global::lat.gd();
+   int d = Global::d;
 
    if(option == 'B' || option == 'A'){
 
@@ -194,8 +194,8 @@ void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const
  */
 void Environment::test_env(){
 
-   int Lx = Global::lat.gLx();
-   int Ly = Global::lat.gLy();
+   int Lx = Global::Lx;
+   int Ly = Global::Ly;
 
    cout << endl;
    cout << "FROM BOTTOM TO TOP" << endl;
