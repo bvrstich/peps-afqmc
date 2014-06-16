@@ -40,11 +40,9 @@ int main(int argc,char *argv[]){
 
    Walker walker(10);
 
-   Environment::calc_env('B',peps,walker);
+   Environment::calc_env('A',peps,walker);
 
-   Environment::test_env();
-
-   /*
+/*
    double dtau = 0.01;
    int Nw = 100;
 

@@ -89,54 +89,39 @@ void MPS::fill(char option,const PEPS< complex<double> > &peps,const Walker &wal
       }
 
    }
-   /*
    else if(option == 'l'){//left
 
-      this->resize(Ly);
-
-      D = peps_1.gD() * peps_2.gD();
-
-      enum {i,j,k,l,m,n,o,p,q};
-
-      TArray<T,8> tmp;
+      TArray<complex<double>,3> tmp;
 
       for(int r = 0;r < Ly;++r){
 
-         int DL = peps_1(r,0).shape(3) * peps_2(r,0).shape(3);
-         int phys_d = peps_1(r,0).shape(4) * peps_2(r,0).shape(4);
-         int DR = peps_1(r,0).shape(1) * peps_2(r,0).shape(1);
+         int dim = (*this)[r].size();
+         tmp.resize(peps(r,0).shape(2),peps(r,0).shape(3),peps(r,0).shape(4));
 
-         Contract((T)1.0,peps_1(r,0),shape(i,j,k,l,m),peps_2(r,0),shape(n,o,k,p,q),(T)0.0,tmp,shape(l,p,m,q,i,n,j,o));
+         blas::gemv(CblasRowMajor, CblasTrans, d, dim , one, peps(r,0).data(), dim , walker(r,0).data(), 1, zero, tmp.data(), 1);
 
-         (*this)[r] = tmp.reshape_clear(shape(DL,phys_d,DR));
+         Permute(tmp,shape(1,2,0),(*this)[r]);
 
       }
 
    }
    else{//finally right
 
-      this->resize(Ly);
-
-      D = peps_1.gD() * peps_2.gD();
-
-      enum {i,j,k,l,m,n,o,p,q};
-
-      TArray<T,8> tmp;
+      TArray<complex<double>,3> tmp;
 
       for(int r = 0;r < Ly;++r){
 
-         int DL = peps_1(r,Lx-1).shape(3) * peps_2(r,Lx-1).shape(3);
-         int phys_d = peps_1(r,Lx-1).shape(0) * peps_2(r,Lx-1).shape(0);
-         int DR = peps_1(r,Lx-1).shape(1) * peps_2(r,Lx-1).shape(1);
+         int dim = (*this)[r].size();
+         tmp.resize(peps(r,Lx-1).shape(1),peps(r,Lx-1).shape(2),peps(r,Lx-1).shape(3));
 
-         Contract((T)1.0,peps_1(r,Lx-1),shape(i,j,k,l,m),peps_2(r,Lx-1),shape(n,o,k,p,q),(T)0.0,tmp,shape(l,p,i,n,m,q,j,o));
+         blas::gemv(CblasRowMajor, CblasTrans, d, dim , one, peps(r,Lx-1).data(), dim , walker(r,Lx-1).data(), 1, zero, tmp.data(), 1);
 
-         (*this)[r] = tmp.reshape_clear(shape(DL,phys_d,DR));
+         Permute(tmp,shape(2,0,1),(*this)[r]);
 
       }
 
    }
-*/
+
 }
 
 /**

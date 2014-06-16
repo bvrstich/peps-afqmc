@@ -64,6 +64,22 @@ void MPO::fill(char option,int rc,const PEPS< complex<double> > &peps,const Walk
    }
    else{//vertical!
 
+      TArray<complex<double>,4> tmp;
+
+      for(int r = 0;r < Ly;++r){
+
+         int dim = (*this)[r].size();
+         
+         tmp.resize(peps(r,rc).shape(1),peps(r,rc).shape(2),peps(r,rc).shape(3),peps(r,rc).shape(4));
+
+         blas::gemv(CblasRowMajor, CblasTrans, d, dim , one, peps(r,rc).data(), dim , walker(r,rc).data(), 1, zero, tmp.data(), 1);
+
+         //PERMUTE!!
+         Permute(tmp,shape(2,3,0,1),(*this)[r]);
+
+      }
+
+
    }
 
 }

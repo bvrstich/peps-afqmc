@@ -202,14 +202,14 @@ void Environment::test_env(){
    cout << endl;
    for(int i = 0;i < Ly - 1;++i)
       cout << i << "\t" << b[i].dot(t[i]) << endl;
-/*
+
    cout << endl;
    cout << "FROM LEFT TO RIGHT" << endl;
    cout << endl;
    for(int i = 0;i < Lx - 1;++i)
       cout << i << "\t" << r[i].dot(l[i]) << endl;
    cout << endl;
-*/
+
 }
 
 /**
