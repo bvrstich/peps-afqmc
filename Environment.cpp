@@ -223,35 +223,33 @@ void Environment::test_env(){
  * @param peps input PEPS<double>
  * @param D_aux dimension to which environment will be compressed
  */
- /*
-void Environment::calc_env(char option,int rc,const PEPS<double> &peps,int D_aux){
+void Environment::calc_env(char option,int rc,const PEPS< complex<double> > &peps,const Walker &walker){
 
-   int Lx = Global::lat.gLx();
-   int Ly = Global::lat.gLy();
+   int Lx = Global::Lx;
+   int Ly = Global::Ly;
 
-   int d = Global::lat.gd();
+   int d = Global::d;
 
    if(option == 'B'){
 
       //construct bottom layer
       if(rc == 0)
-         b[0] = MPS<double>('b',peps,peps);
+         b[0].fill('b',peps,walker);
       else{
 
          //i'th row as MPO
-         MPO<double> mpo('H',rc,peps,peps);
+         mpo.fill('H',rc,peps,walker);
 
-         MPS<double> tmp(b[rc - 1]);
+         MPS tmp(b[rc - 1]);
 
-         //apply to form MPS with bond dimension D^4
+         //apply to form MPS with bond dimension D^2
          tmp.gemv('L',mpo);
 
          //reduce the dimensions of the edge states using thin svd
          tmp.cut_edges();
 
          //compress in sweeping fashion
-         b[rc].resize(Lx);
-         b[rc].compress(D_aux,tmp,5);
+         b[rc].compress(D_aux,tmp,1);
 
       }
 
@@ -260,14 +258,14 @@ void Environment::calc_env(char option,int rc,const PEPS<double> &peps,int D_aux
 
       //then construct top layer
       if(rc == Ly-1)
-         t[Ly - 2] = MPS<double>('t',peps,peps);
+         t[Ly - 2].fill('t',peps,walker);
       else{
 
          //i'th row as MPO
-         MPO<double> mpo('H',rc,peps,peps);
+         mpo.fill('H',rc,peps,walker);
 
          //apply to form MPS with bond dimension D^4
-         MPS<double> tmp(t[rc]);
+         MPS tmp(t[rc]);
 
          tmp.gemv('U',mpo);
 
@@ -275,8 +273,7 @@ void Environment::calc_env(char option,int rc,const PEPS<double> &peps,int D_aux
          tmp.cut_edges();
 
          //compress in sweeping fashion
-         t[rc - 1].resize(Lx);
-         t[rc - 1].compress(D_aux,tmp,5);
+         t[rc - 1].compress(D_aux,tmp,1);
 
       }
 
@@ -285,13 +282,13 @@ void Environment::calc_env(char option,int rc,const PEPS<double> &peps,int D_aux
 
       //then left layer
       if(rc == 0)
-         l[0] = MPS<double>('l',peps,peps);
+         l[0].fill('l',peps,walker);
       else{
 
-         //i'th col as MPO
-         MPO<double> mpo('V',rc,peps,peps);
+         //rc'th col as MPO
+         mpo.fill('V',rc,peps,walker);
 
-         MPS<double> tmp(l[rc - 1]);
+         MPS tmp(l[rc - 1]);
 
          //apply to form MPS with bond dimension D^4
          tmp.gemv('L',mpo);
@@ -300,8 +297,7 @@ void Environment::calc_env(char option,int rc,const PEPS<double> &peps,int D_aux
          tmp.cut_edges();
 
          //compress in sweeping fashion
-         l[rc].resize(Ly);
-         l[rc].compress(D_aux,tmp,5);
+         l[rc].compress(D_aux,tmp,1);
 
       }
 
@@ -310,14 +306,14 @@ void Environment::calc_env(char option,int rc,const PEPS<double> &peps,int D_aux
 
       //finally construct right layer
       if(rc == Lx - 1)
-         r[Lx - 2] = MPS<double>('r',peps,peps);
+         r[Lx - 2].fill('r',peps,walker);
       else{
 
          //i'th row as MPO
-         MPO<double> mpo('V',rc,peps,peps);
+         mpo.fill('V',rc,peps,walker);
 
          //apply to form MPS with bond dimension D^4
-         MPS<double> tmp(r[rc]);
+         MPS tmp(r[rc]);
 
          tmp.gemv('U',mpo);
 
@@ -325,12 +321,10 @@ void Environment::calc_env(char option,int rc,const PEPS<double> &peps,int D_aux
          tmp.cut_edges();
 
          //compress in sweeping fashion
-         r[rc - 1].resize(Ly);
-         r[rc - 1].compress(D_aux,tmp,5);
+         r[rc - 1].compress(D_aux,tmp,1);
 
       }
 
    }
 
 }
-*/
