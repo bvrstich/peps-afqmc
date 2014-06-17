@@ -57,18 +57,52 @@ MPS::~MPS(){ }
  * @param row index of row
  * @param slp single layer contracted peps
  */
-void MPS::fill(int row,const SL_PEPS &slp) {
+void MPS::fill(char option,const SL_PEPS &slp) {
 
-   if(row == 0){
-
-      complex<double> one(1.0,0.0);
+   if(option == 'b'){
 
       //just a deep copy of slp bottom row
       for(int col = 0;col < Lx;++col){
 
-         int dim = slp(row,col).size();
+         int dim = slp(0,col).size();
 
-         blas::copy(dim, slp(row,col).data(), one  , (*this)[col].data(), one);
+         blas::copy(dim,slp(0,col).data(),1,(*this)[col].data(),1);
+
+      }
+
+   }
+   else if(option == 't'){
+
+      //just a deep copy of slp bottom row
+      for(int col = 0;col < Lx;++col){
+
+         int dim = slp(Ly-1,col).size();
+
+         blas::copy(dim,slp(Ly-1,col).data(),1,(*this)[col].data(),1);
+
+      }
+
+   }
+   else if(option == 'l'){
+
+      //just a deep copy of slp left column
+      for(int row = 0;row < Ly;++row){
+
+         int dim = slp(row,0).size();
+
+         blas::copy(dim,slp(row,0).data(),1,(*this)[row].data(),1);
+
+      }
+
+   }
+   else{//right
+
+      //just a deep copy of slp right column
+      for(int row = 0;row < Ly;++row){
+
+         int dim = slp(row,Lx-1).size();
+
+         blas::copy(dim,slp(row,Lx-1).data(),1,(*this)[row].data(),1);
 
       }
 
@@ -86,94 +120,179 @@ int MPS::gD() const {
 }
 
 /**
- * act with an MPO on this MPS, resulting MPS is returned as *this object
+ * act with an SL_PEPS row (basically an MPO) on this MPS, resulting MPS is returned as *this object
  * @param uplo if == 'U' contract with the upper physical index of the MPO, if == 'L', contract with the lower
- * @param mpo the MPO
+ * @param option == 'H'orizontal or 'V'ertical
+ * @param rc the row/column index
+ * @param slp the SL_PEPS
  */
-void MPS::gemv(char uplo,const MPO &mpo){
+void MPS::gemv(char uplo,char option, int rc,const SL_PEPS &slp){
 
-   int DO = mpo.gD();
+   int DO = slp.gD();
 
    int L = this->size();
 
    complex<double> one(1.0,0.0);
    complex<double> zero(0.0,0.0);
 
-   if(uplo == 'U'){
+   if(option == 'H'){
 
-      //first site
-      TArray<complex<double>,5> tmp;
+      if(uplo == 'U'){
 
-      enum {i,j,k,l,m,n,o,p,q};
+         //first site
+         TArray<complex<double>,5> tmp;
 
-      //dimensions of the new MPS
-      int d_phys = (*this)[0].shape(1);
-      int DL = 1;
-      int DR = (*this)[0].shape(2) * mpo[0].shape(3);
+         enum {i,j,k,l,m,n,o,p,q};
 
-      Contract(one,mpo[0],shape(i,j,k,l),(*this)[0],shape(m,j,n),zero,tmp,shape(m,i,k,n,l));
+         //dimensions of the new MPS
+         int d_phys = (*this)[0].shape(1);
+         int DL = 1;
+         int DR = (*this)[0].shape(2) * slp(rc,0).shape(3);
 
-      (*this)[0] = tmp.reshape_clear(shape(DL,d_phys,DR));
+         Contract(one,slp(rc,0),shape(i,j,k,l),(*this)[0],shape(m,j,n),zero,tmp,shape(m,i,k,n,l));
 
-      //middle sites
-      for(int c = 1;c < L - 1;++c){
+         (*this)[0] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+         //middle sites
+         for(int col = 1;col < L - 1;++col){
+
+            DL = DR;
+            DR = (*this)[col].shape(2) * slp(rc,col).shape(3);
+
+            Contract(one,slp(rc,col),shape(i,j,k,l),(*this)[col],shape(m,j,n),zero,tmp,shape(m,i,k,n,l));
+
+            (*this)[col] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+         }
 
          DL = DR;
-         DR = (*this)[c].shape(2) * mpo[c].shape(3);
+         DR = 1;
 
-         Contract(one,mpo[c],shape(i,j,k,l),(*this)[c],shape(m,j,n),zero,tmp,shape(m,i,k,n,l));
+         Contract(one,slp(rc,L - 1),shape(i,j,k,l),(*this)[L - 1],shape(m,j,n),zero,tmp,shape(m,i,k,n,l));
 
-         (*this)[c] = tmp.reshape_clear(shape(DL,d_phys,DR));
+         (*this)[L - 1] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+      }
+      else{//Lower index contraction
+
+         //first site
+         TArray<complex<double>,5> tmp;
+
+         enum {i,j,k,l,m,n,o,p,q};
+
+         //dimensions of the new MPS
+         int d_phys = (*this)[0].shape(1);
+         int DL = 1;
+         int DR = (*this)[0].shape(2) * slp(rc,0).shape(3);
+
+         Contract(one,slp(rc,0),shape(i,j,k,l),(*this)[0],shape(m,k,n),zero,tmp,shape(m,i,j,n,l));
+
+         (*this)[0] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+         //middle sites
+         for(int col = 1;col < L - 1;++col){
+
+            DL = DR;
+            DR = (*this)[col].shape(2) * slp(rc,col).shape(3);
+
+            Contract(one,slp(rc,col),shape(i,j,k,l),(*this)[col],shape(m,k,n),zero,tmp,shape(m,i,j,n,l));
+
+            (*this)[col] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+         }
+
+         DL = DR;
+         DR = 1;
+
+         Contract(one,slp(rc,L - 1),shape(i,j,k,l),(*this)[L - 1],shape(m,k,n),zero,tmp,shape(m,i,j,n,l));
+
+         (*this)[L - 1] = tmp.reshape_clear(shape(DL,d_phys,DR));
 
       }
 
-      DL = DR;
-      DR = 1;
-
-      Contract(one,mpo[L - 1],shape(i,j,k,l),(*this)[L - 1],shape(m,j,n),zero,tmp,shape(m,i,k,n,l));
-
-      (*this)[L - 1] = tmp.reshape_clear(shape(DL,d_phys,DR));
+      //vdim is increased
+      D *= DO;
 
    }
-   else{//L
+   else{// VERTICAL
 
-      //first site
-      TArray<complex<double>,5> tmp;
+      if(uplo == 'U'){
 
-      enum {i,j,k,l,m,n,o,p,q};
+         //first site
+         TArray<complex<double>,5> tmp;
 
-      //dimensions of the new MPS
-      int d_phys = (*this)[0].shape(1);
-      int DL = 1;
-      int DR = (*this)[0].shape(2) * mpo[0].shape(3);
+         enum {i,j,k,l,m,n,o,p,q};
 
-      Contract(one,mpo[0],shape(i,j,k,l),(*this)[0],shape(m,k,n),zero,tmp,shape(m,i,j,n,l));
+         //dimensions of the new MPS
+         int d_phys = (*this)[0].shape(1);
+         int DL = 1;
+         int DR = (*this)[0].shape(2) * slp(0,rc).shape(3);
 
-      (*this)[0] = tmp.reshape_clear(shape(DL,d_phys,DR));
+         Contract(one,slp(0,rc),shape(i,j,k,l),(*this)[0],shape(m,j,n),zero,tmp,shape(m,i,k,n,l));
 
-      //middle sites
-      for(int c = 1;c < L - 1;++c){
+         (*this)[0] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+         //middle sites
+         for(int row = 1;row < L - 1;++row){
+
+            DL = DR;
+            DR = (*this)[row].shape(2) * slp(row,rc).shape(3);
+
+            Contract(one,slp(row,rc),shape(i,j,k,l),(*this)[row],shape(m,j,n),zero,tmp,shape(m,i,k,n,l));
+
+            (*this)[row] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+         }
 
          DL = DR;
-         DR = (*this)[c].shape(2) * mpo[c].shape(3);
+         DR = 1;
 
-         Contract(one,mpo[c],shape(i,j,k,l),(*this)[c],shape(m,k,n),zero,tmp,shape(m,i,j,n,l));
+         Contract(one,slp(L - 1,rc),shape(i,j,k,l),(*this)[L - 1],shape(m,j,n),zero,tmp,shape(m,i,k,n,l));
 
-         (*this)[c] = tmp.reshape_clear(shape(DL,d_phys,DR));
+         (*this)[L - 1] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+      }
+      else{//Lower index contraction
+
+         //first site
+         TArray<complex<double>,5> tmp;
+
+         enum {i,j,k,l,m,n,o,p,q};
+
+         //dimensions of the new MPS
+         int d_phys = (*this)[0].shape(1);
+         int DL = 1;
+         int DR = (*this)[0].shape(2) * slp(0,rc).shape(3);
+
+         Contract(one,slp(0,rc),shape(i,j,k,l),(*this)[0],shape(m,k,n),zero,tmp,shape(m,i,j,n,l));
+
+         (*this)[0] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+         //middle sites
+         for(int row = 1;row < L - 1;++row){
+
+            DL = DR;
+            DR = (*this)[row].shape(2) * slp(row,rc).shape(3);
+
+            Contract(one,slp(row,rc),shape(i,j,k,l),(*this)[row],shape(m,k,n),zero,tmp,shape(m,i,j,n,l));
+
+            (*this)[row] = tmp.reshape_clear(shape(DL,d_phys,DR));
+
+         }
+
+         DL = DR;
+         DR = 1;
+
+         Contract(one,slp(L - 1,rc),shape(i,j,k,l),(*this)[L - 1],shape(m,k,n),zero,tmp,shape(m,i,j,n,l));
+
+         (*this)[L - 1] = tmp.reshape_clear(shape(DL,d_phys,DR));
 
       }
 
-      DL = DR;
-      DR = 1;
-
-      Contract(one,mpo[L - 1],shape(i,j,k,l),(*this)[L - 1],shape(m,k,n),zero,tmp,shape(m,i,j,n,l));
-
-      (*this)[L - 1] = tmp.reshape_clear(shape(DL,d_phys,DR));
+      //vdim is increased
+      D *= DO;
 
    }
-
-   //vdim is increased
-   D *= DO;
 
 }
 

@@ -41,6 +41,7 @@ int main(int argc,char *argv[]){
    Walker walker(10);
 
    Environment::calc_env('H',peps,walker);
+   Environment::calc_env('V',peps,walker);
    Environment::test_env();
 /*
    walker.calc_properties('H',peps);

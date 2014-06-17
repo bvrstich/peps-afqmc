@@ -34,9 +34,9 @@ class MPS : public vector< TArray<complex<double>,3> > {
 
       int gD() const;
 
-      void fill(int,const SL_PEPS &);
+      void fill(char,const SL_PEPS &);
 
-      void gemv(char, const MPO &);
+      void gemv(char,char ,int, const SL_PEPS &);
 
       void canonicalize(const BTAS_SIDE &,bool);
 
