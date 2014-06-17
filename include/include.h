@@ -6,7 +6,7 @@
 #include <btas/DENSE/TArray.h>
 
 #include "Random.h"
-#include "Global.h"
+#include "global.h"
 
 #include "PEPS.h"
 #include "Walker.h"

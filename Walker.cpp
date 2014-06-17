@@ -6,29 +6,27 @@
 #include <complex>
 #include <vector>
 
-#include "include.h"
-
 using std::cout;
 using std::ifstream;
 using std::ofstream;
 using std::endl;
 
+#include "include.h"
+
+using namespace global;
+
 /**
  * empty constructor:
  */
-Walker::Walker() : std::vector< TArray<complex<double>,1> >( Global::Lx * Global::Ly ){ }
+Walker::Walker() : std::vector< TArray<complex<double>,1> >( Lx * Ly ){ }
 
 /**
  * construct a Walker object: initialize on AF state
  * @param n_trot_in number of trotter terms
  */
-Walker::Walker(int n_trot_in) : std::vector< TArray<complex<double>,1> >( Global::Lx * Global::Ly ){
+Walker::Walker(int n_trot_in) : std::vector< TArray<complex<double>,1> >( Lx * Ly ){
 
    this->n_trot = n_trot_in;
-
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
-   int d = Global::d;
 
    for(int r = 0;r < Ly;++r)
       for(int c = 0;c < Lx;++c){
@@ -152,7 +150,7 @@ const std::vector< complex<double> > &Walker::gVL() const{
  */
 const TArray<complex<double>,1> &Walker::operator()(int r,int c) const {
 
-   return (*this)[r*Global::Lx + c];
+   return (*this)[r*Lx + c];
 
 }
 
@@ -164,10 +162,6 @@ const TArray<complex<double>,1> &Walker::operator()(int r,int c) const {
 complex<double> Walker::calc_properties(char option,const PEPS< complex<double> >& peps){
 
    // ---- || evaluate the expectation values in an MPO/MPS manner, first from bottom to top, then left to right || ----
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
-
-   int d = Global::d;
 
    complex<double> energy(0.0,0.0);
 

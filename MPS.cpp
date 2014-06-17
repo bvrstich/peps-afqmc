@@ -12,10 +12,12 @@ using std::ofstream;
 
 #include "include.h"
 
+using namespace global;
+
 /** 
  * empty constructor: just sets the length of the vector
  */
-MPS::MPS() : vector< TArray<complex<double>,3> >( Global::Lx ) { }
+MPS::MPS() : vector< TArray<complex<double>,3> >( Lx ) { }
 
 /** 
  * standard constructor: just takes in
@@ -23,9 +25,7 @@ MPS::MPS() : vector< TArray<complex<double>,3> >( Global::Lx ) { }
  * @param D_in virtual max bond dimension
  * allocates the tensors and fills them randomly
  */
-MPS::MPS(int D_in) : vector< TArray<complex<double>,3> >( Global::Lx ) {
-
-   int Lx = Global::Lx;
+MPS::MPS(int D_in) : vector< TArray<complex<double>,3> >( Lx ) {
 
    this->D = D_in;
 
@@ -58,11 +58,6 @@ MPS::~MPS(){ }
  * from left 'l' c = 0, or right 'r' c = Lx-1
  */
 void MPS::fill(char option,const PEPS< complex<double> > &peps,const Walker &walker) {
-
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
-
-   int d = Global::d;
 
    complex<double> one(1.0,0.0);
    complex<double> zero(0.0,0.0);

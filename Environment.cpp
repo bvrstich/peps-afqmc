@@ -12,6 +12,8 @@ using std::ofstream;
 
 #include "include.h"
 
+using namespace global;
+
 //statics
 vector< MPS > Environment::l;
 vector< MPS > Environment::r;
@@ -30,9 +32,6 @@ int Environment::D_aux;
 void Environment::init(int D,int D_aux_in){
 
    D_aux = D_aux_in;
-
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
 
    t.resize(Ly - 1);
    b.resize(Ly - 1);
@@ -81,11 +80,6 @@ void Environment::init(int D,int D_aux_in){
  * @param D_aux dimension to which environment will be compressed
  */
 void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const Walker &walker){
-
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
-
-   int d = Global::d;
 
    if(option == 'B' || option == 'A'){
 
@@ -194,9 +188,6 @@ void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const
  */
 void Environment::test_env(){
 
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
-
    cout << endl;
    cout << "FROM BOTTOM TO TOP" << endl;
    cout << endl;
@@ -224,11 +215,6 @@ void Environment::test_env(){
  * @param D_aux dimension to which environment will be compressed
  */
 void Environment::calc_env(char option,int rc,const PEPS< complex<double> > &peps,const Walker &walker){
-
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
-
-   int d = Global::d;
 
    if(option == 'B'){
 

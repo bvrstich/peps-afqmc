@@ -12,20 +12,20 @@ using std::ofstream;
 
 #include "include.h"
 
+using namespace global;
+
 /**
  * empty constructor
  */
-MPO::MPO() : vector< TArray<complex<double>,4> > ( Global::Lx ) { }
+MPO::MPO() : vector< TArray<complex<double>,4> > ( Lx ) { }
 
 /**
  * constructor of MPO: allocates the matrices
  * @param D_in bond input dimension
  */
-MPO::MPO(int D_in) : vector< TArray<complex<double>,4> > ( Global::Lx ) {
+MPO::MPO(int D_in) : vector< TArray<complex<double>,4> > ( Lx ) {
 
    this->D = D_in;
-
-   int Lx = Global::Lx;
 
    (*this)[0].resize(1,D,D,D);
 
@@ -42,11 +42,6 @@ MPO::MPO(int D_in) : vector< TArray<complex<double>,4> > ( Global::Lx ) {
  * @param rc row or column index
  */
 void MPO::fill(char option,int rc,const PEPS< complex<double> > &peps,const Walker &walker) {
-
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
-
-   int d = Global::d;
 
    complex<double> one(1.0,0.0);
    complex<double> zero(0.0,0.0);

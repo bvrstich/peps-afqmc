@@ -12,24 +12,22 @@ using std::ofstream;
 
 #include "include.h"
 
+using namespace global;
+
 /**
  * construct an empty PEPS object, note: be sure to initialize the Lattice object before calling the constructor
  */
 template<typename T>
-PEPS<T>::PEPS() : vector< TArray<T,5> >(Global::Lx * Global::Ly) { }
+PEPS<T>::PEPS() : vector< TArray<T,5> >(Lx * Ly) { }
 
 /**
  * construct constructs a standard PEPS object, note: be sure to initialize the Lattice object before calling the constructor
  * @param D_in cutoff virtual dimension
  */
 template<typename T>
-PEPS<T>::PEPS(int D_in) : vector< TArray<T,5> >(Global::Lx * Global::Ly) {
+PEPS<T>::PEPS(int D_in) : vector< TArray<T,5> >(Lx * Ly) {
 
    D = D_in;
-
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
-   int d = Global::d;
 
    //corners first
 
@@ -72,7 +70,7 @@ PEPS<T>::PEPS(int D_in) : vector< TArray<T,5> >(Global::Lx * Global::Ly) {
    for(int r = 0;r < Ly;++r)
       for(int c = 0;c < Lx;++c){
 
-         (*this)[ r*Lx + c ].generate(Global::rgen<T>);
+         (*this)[ r*Lx + c ].generate(rgen<T>);
 
          Normalize((*this)[ r*Lx + c ]);
          Scal((T)D,(*this)[ r*Lx + c ]);
@@ -106,7 +104,7 @@ PEPS<T>::~PEPS(){ }
 template<typename T>
 const TArray<T,5> &PEPS<T>::operator()(int r,int c) const {
 
-   return (*this)[r*Global::Lx + c];
+   return (*this)[r*Lx + c];
 
 }
 
@@ -119,7 +117,7 @@ const TArray<T,5> &PEPS<T>::operator()(int r,int c) const {
 template<typename T>
 TArray<T,5> &PEPS<T>::operator()(int r,int c) {
 
-   return (*this)[r*Global::Lx + c];
+   return (*this)[r*Lx + c];
 
 }
 
@@ -150,9 +148,6 @@ void PEPS<T>::sD(int D_in){
  */
 template<typename T>
 void PEPS<T>::load(const char *filename){
-
-   int Lx = Global::Lx;
-   int Ly = Global::Ly;
 
    for(int row = 0;row < Ly;++row)
       for(int col = 0;col < Lx;++col){
