@@ -208,14 +208,14 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
       ZArray<2> Ly;
       ZArray<2> Lz;
       ZArray<2> Lu;
-/*
-      //local operators acting on site
-      ZArray<3> lsm;
-      ZArray<3> lsp;
-      ZArray<3> lsz;
 
+      //local operators acting on site
+      ZArray<3> lsx;
+      ZArray<3> lsy;
+      ZArray<3> lsz;
+/*
       //first S+
-      Environment::construct_double_layer('H',peps(0,0),Sp,dlsp);
+      Environment::calc_exp_site('H',peps(0,0),Sp,dlsp);
 
       //tmp comes out index (t,b)
       Contract(1.0,Environment::t[0][0],shape(1),dlsp,shape(1),0.0,tmp);
