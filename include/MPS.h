@@ -34,7 +34,7 @@ class MPS : public vector< TArray<complex<double>,3> > {
 
       int gD() const;
 
-      void fill(char,const PEPS< complex<double> > &,const Walker &);
+      void fill(int,const SL_PEPS &);
 
       void gemv(char, const MPO &);
 

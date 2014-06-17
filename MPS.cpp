@@ -54,12 +54,25 @@ MPS::~MPS(){ }
 
 /**
  * fill a MPS object, by creating a single layer from contracting a peps with a physical vector
- * @param rc index of row/column
+ * @param row index of row
  * @param slp single layer contracted peps
  */
-void MPS::fill(int rc,const SL_PEPS > &slp) {
+void MPS::fill(int row,const SL_PEPS &slp) {
 
-   for(int i = 0;i )
+   if(row == 0){
+
+      complex<double> one(1.0,0.0);
+
+      //just a deep copy of slp bottom row
+      for(int col = 0;col < Lx;++col){
+
+         int dim = slp(row,col).size();
+
+         blas::copy(dim, slp(row,col).data(), one  , (*this)[col].data(), one);
+
+      }
+
+   }
 
 }
 
