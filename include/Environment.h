@@ -31,6 +31,9 @@ class Environment {
       static vector< MPS > t;
       static vector< MPS > b;
 
+      //!overlap between walker and trial PEPS
+      static SL_PEPS U;
+
       //!for the contraction
       static MPO mpo;
 

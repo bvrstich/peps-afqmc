@@ -24,6 +24,8 @@ MPO Environment::mpo;
 
 int Environment::D_aux;
 
+SL_PEPS Environment::U;
+
 /** 
  * initialize all the static variables
  * @param D bond dimension of the trial peps
@@ -67,21 +69,19 @@ void Environment::init(int D,int D_aux_in){
 
    mpo = MPO(D);
 
+   U = SL_PEPS(D);
+
 }
 
 /**
- * construct the enviroment mps's for the input PEPS
- * @param option if 'L' construct full left environment
- *               if 'R' construct full right environment
- *               if 'T' construct full top environment
- *               if 'B' construct full bottom environment
- *               if 'A' construct all environments
+ * construct the enviroment mps's for the input PEPS: make sure the appropriate SL_PEPS's are filled
+ * @param option if 'H' construct top and bottom environment
+ *               if 'V' construct left and right environment
  * @param peps input PEPS<double>
- * @param D_aux dimension to which environment will be compressed
  */
 void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const Walker &walker){
 
-   if(option == 'B' || option == 'A'){
+   if(option == 'H'){
 
       //construct bottom layer
       b[0].fill('b',peps,walker);
@@ -103,10 +103,6 @@ void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const
          b[r].compress(D_aux,tmp,1);
 
       }
-
-   }
-
-   if(option == 'T' || option == 'A'){
 
       //then construct top layer
       t[Ly - 2].fill('t',peps,walker);
@@ -130,8 +126,7 @@ void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const
       }
 
    }
-
-   if(option == 'L' || option == 'A'){
+   else{//Vertical
 
       //then left layer
       l[0].fill('l',peps,walker);
@@ -153,10 +148,6 @@ void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const
          l[i].compress(D_aux,tmp,1);
 
       }
-
-   }
-
-   if(option == 'R' || option == 'A'){
 
       //finally construct right layer
       r[Lx - 2].fill('r',peps,walker);
