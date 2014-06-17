@@ -54,68 +54,12 @@ MPS::~MPS(){ }
 
 /**
  * fill a MPS object, by creating a single layer from contracting a peps with a physical vector
- * @param option construct mps from bottom layer (r == 0) if option == 'b', from top layer (r = Ly-1) if option == 't'
- * from left 'l' c = 0, or right 'r' c = Lx-1
+ * @param rc index of row/column
+ * @param slp single layer contracted peps
  */
-void MPS::fill(char option,const PEPS< complex<double> > &peps,const Walker &walker) {
+void MPS::fill(int rc,const SL_PEPS > &slp) {
 
-   complex<double> one(1.0,0.0);
-   complex<double> zero(0.0,0.0);
-
-   if(option == 'b'){
-
-      for(int c = 0;c < Lx;++c){
-
-         int dim = (*this)[c].size();
-
-         blas::gemv(CblasRowMajor, CblasTrans, d, dim , one, peps(0,c).data(), dim , walker(0,c).data(), 1, zero, (*this)[c].data(), 1);
-
-      }
-
-   }
-   else if(option == 't'){//top
-
-      for(int c = 0;c < Lx;++c){
-
-         int dim = (*this)[c].size();
-
-         blas::gemv(CblasRowMajor, CblasTrans, d, dim , one, peps(Ly-1,c).data(), dim , walker(Ly-1,c).data(), 1, zero, (*this)[c].data(), 1);
-
-      }
-
-   }
-   else if(option == 'l'){//left
-
-      TArray<complex<double>,3> tmp;
-
-      for(int r = 0;r < Ly;++r){
-
-         int dim = (*this)[r].size();
-         tmp.resize(peps(r,0).shape(2),peps(r,0).shape(3),peps(r,0).shape(4));
-
-         blas::gemv(CblasRowMajor, CblasTrans, d, dim , one, peps(r,0).data(), dim , walker(r,0).data(), 1, zero, tmp.data(), 1);
-
-         Permute(tmp,shape(1,2,0),(*this)[r]);
-
-      }
-
-   }
-   else{//finally right
-
-      TArray<complex<double>,3> tmp;
-
-      for(int r = 0;r < Ly;++r){
-
-         int dim = (*this)[r].size();
-         tmp.resize(peps(r,Lx-1).shape(1),peps(r,Lx-1).shape(2),peps(r,Lx-1).shape(3));
-
-         blas::gemv(CblasRowMajor, CblasTrans, d, dim , one, peps(r,Lx-1).data(), dim , walker(r,Lx-1).data(), 1, zero, tmp.data(), 1);
-
-         Permute(tmp,shape(2,0,1),(*this)[r]);
-
-      }
-
-   }
+   for(int i = 0;i )
 
 }
 

@@ -83,8 +83,10 @@ void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const
 
    if(option == 'H'){
 
+      U.fill('H',peps,walker);
+
       //construct bottom layer
-      b[0].fill('b',peps,walker);
+      b[0].fill(0,U);
 
       for(int r = 1;r < Ly - 1;++r){
 
