@@ -70,9 +70,6 @@ class Walker : public vector< TArray<complex<double>,1> > {
       //!local auxiliary operators: <PsiT|v|phi>/<PsiT|phi>
       std::vector< complex<double> > VL;
 
-      //!Sx,Sy and Sz operator application to walker
-      std::vector< TArray<complex<double>,1> > w_xyz;
-      
 };
 
 #endif

@@ -21,6 +21,8 @@ namespace global{
 
    TArray<complex<double>,2> Sz;
 
+   std::vector< std::vector< complex<double> > > auxvec;
+
    int Lx;
    int Ly;
 
@@ -63,6 +65,11 @@ namespace global{
       Sz(0,1) = complex<double>(0.0,0.0);
       Sz(1,0) = complex<double>(0.0,0.0);
       Sz(1,1) = complex<double>(0.5,0.0);
+
+      auxvec.resize(Lx*Ly);
+
+      for(int i = 0;i < auxvec.size();++i)//for x,y and z components
+         auxvec[i].resize(3);
 
    }
 

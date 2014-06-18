@@ -48,12 +48,6 @@ Walker::Walker(int n_trot_in) : std::vector< TArray<complex<double>,1> >( Lx * L
 
       }
 
-   w_xyz.resize(3*Lx*Ly);
-
-   for(int i = 0;i < Lx*Ly;++i)
-      for(int r = 0;r < 3;++r)//regular vector
-         w_xyz[3*i + r].resize(d);
-
    VL.resize(3*n_trot);
 
 }
@@ -69,7 +63,6 @@ Walker::Walker(const Walker &walker) : std::vector< TArray<complex<double>,1> >(
    this->overlap = walker.gOverlap();
    this->EL = walker.gEL();
    this->VL = walker.gVL();
-   this->w_xyz = walker.w_xyz;
 
 }
 
@@ -170,9 +163,15 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
 
    if(option == 'H'){
 
-      //first construct the top environment layers
-      Environment::calc_env('T',peps,*this);
-      Environment::calc_env('B',0,peps,*this);
+      //calculate the single layer contractions first:
+      Environment::U.fill('H',peps,*this);
+
+      Environment::Sx.fill('H',peps,Sx,*this);
+      Environment::Sy.fill('H',peps,Sy,*this);
+      Environment::Sz.fill('H',peps,Sz,*this);
+
+      //first construct the top and bottom (horizontal) environment layers
+      Environment::calc_env('H',peps,*this);
 
       // #################################################################
       // ### ---- from bottom to top: contract in mps/mpo fashion ---- ### 
@@ -184,65 +183,61 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
       vector< ZArray<2> > R(Lx - 1);
 
       //first the rightmost operator
-      ZArray<4> tmp;
-      ZArray<3> I;
+      ZArray<4> tmp4;
+      ZArray<3> tmp3;
 
       //tmp comes out index (t,b)
-      Contract(one,Environment::t[0][Lx - 1],shape(1),Environment::b[0][Lx - 1],shape(1),zero,tmp);
+      Contract(one,Environment::t[0][Lx - 1],shape(1),Environment::b[0][Lx - 1],shape(1),zero,tmp4);
 
       //reshape tmp to a 2-index array
-      R[Lx - 2] = tmp.reshape_clear(shape(Environment::t[0][Lx - 1].shape(0),Environment::b[0][Lx - 1].shape(0)));
+      R[Lx - 2] = tmp4.reshape_clear(shape(Environment::t[0][Lx - 1].shape(0),Environment::b[0][Lx - 1].shape(0)));
 
       //now construct the rest
       for(int col = Lx - 2;col > 0;--col){
 
-         I.clear();
-         Contract(one,Environment::t[0][col],shape(2),R[col],shape(0),zero,I);
+         tmp3.clear();
+         Contract(one,Environment::t[0][col],shape(2),R[col],shape(0),zero,tmp3);
 
-         Contract(one,I,shape(1,2),Environment::b[0][col],shape(1,2),zero,R[col-1]);
+         Contract(one,tmp3,shape(1,2),Environment::b[0][col],shape(1,2),zero,R[col-1]);
 
       }
 
       //4 left going operators: Sx, Sy, Sz, and 1
-      ZArray<2> Lx;
-      ZArray<2> Ly;
-      ZArray<2> Lz;
-      ZArray<2> Lu;
+      ZArray<2> LSx;
+      ZArray<2> LSy;
+      ZArray<2> LSz;
+      ZArray<2> LU;
 
-      //local operators acting on site
-      ZArray<3> lsx;
-      ZArray<3> lsy;
-      ZArray<3> lsz;
+      TArray<complex<double>,5> tmp5;
+
+      //tmp comes out index (t,b)
+      Contract(one,Environment::t[0][0],shape(1),Environment::Sx(0,0),shape(1),zero,tmp5);
+
+      LSx = tmp5.reshape_clear(shape(Environment::t[0][0].shape(2),Environment::Sx(0,0).shape(3)));
+
+      //then Sy
+      Contract(one,Environment::t[0][0],shape(1),Environment::Sy(0,0),shape(1),zero,tmp5);
+
+      LSy = tmp5.reshape_clear(shape(Environment::t[0][0].shape(2),Environment::Sy(0,0).shape(3)));
+
+      //then Sz
+      Contract(one,Environment::t[0][0],shape(1),Environment::Sz(0,0),shape(1),zero,tmp5);
+
+      LSz = tmp5.reshape_clear(shape(Environment::t[0][0].shape(2),Environment::Sz(0,0).shape(3)));
+
+      //finally unity
+      Contract(one,Environment::t[0][0],shape(1),Environment::U(0,0),shape(1),zero,tmp5);
+
+      LU = tmp5.reshape_clear(shape(Environment::t[0][0].shape(2),Environment::Sz(0,0).shape(3)));
+
+      int dim = R[0].size();
+
+      //now contract x,y and z with R for local expectation values:
+      auxvec[0][0] = blas::dot(dim,LSx.data(),1,R[0].data(),1);
+      auxvec[0][1] = blas::dot(dim,LSy.data(),1,R[0].data(),1);
+      auxvec[0][2] = blas::dot(dim,LSz.data(),1,R[0].data(),1);
+
 /*
-      //first S+
-      Environment::calc_exp_site('H',peps(0,0),Sp,dlsp);
-
-      //tmp comes out index (t,b)
-      Contract(1.0,Environment::t[0][0],shape(1),dlsp,shape(1),0.0,tmp);
-
-      Lp = tmp.reshape_clear(shape(Environment::t[0][0].shape(2),dlsp.shape(2)));
-
-      //then S-
-      Environment::construct_double_layer('H',peps(0,0),Sm,dlsm);
-
-      //tmp comes out index (t,b)
-      Contract(1.0,Environment::t[0][0],shape(1),dlsm,shape(1),0.0,tmp);
-
-      Lm = tmp.reshape_clear(shape(Environment::t[0][0].shape(2),dlsm.shape(2)));
-
-      //then Sz 
-      Environment::construct_double_layer('H',peps(0,0),Sz,dlsz);
-
-      //tmp comes out index (t,b)
-      Contract(1.0,Environment::t[0][0],shape(1),dlsz,shape(1),0.0,tmp);
-
-      Lz = tmp.reshape_clear(shape(Environment::t[0][0].shape(2),dlsz.shape(2)));
-
-      //and finally unity
-      Contract(1.0,Environment::t[0][0],shape(1),Environment::b[0][0],shape(1),0.0,tmp);
-
-      Lu = tmp.reshape_clear(shape(Environment::t[0][0].shape(2),Environment::b[0][0].shape(2)));
-
       double val = 0.0;
 
       //now for the middle terms

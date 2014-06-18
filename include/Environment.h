@@ -34,8 +34,10 @@ class Environment {
       //!overlap between walker and trial PEPS
       static SL_PEPS U;
 
-      //!for the contraction
-      static MPO mpo;
+      //!expectation between walker and trial, with operator O=Sn
+      static SL_PEPS Sx;
+      static SL_PEPS Sy;
+      static SL_PEPS Sz;
 
       //!auxiliary bond dimension for the environment contractions
       static int D_aux;

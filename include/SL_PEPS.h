@@ -35,7 +35,7 @@ class SL_PEPS : public vector< TArray<complex<double>,4> > {
       //fill by just overlap
       void fill(char,const PEPS< complex<double> > &,const Walker &);
 
-      //fill by 'expectation value' with some operator
+      //fill with expectation value between walker, peps and operator
       void fill(char,const PEPS< complex<double> > &,TArray<complex<double>,2> &,const Walker &);
 
       const TArray<complex<double>,4> &operator()(int,int) const;

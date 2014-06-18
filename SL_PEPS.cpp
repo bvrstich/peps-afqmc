@@ -137,6 +137,60 @@ void SL_PEPS::fill(char option,const PEPS< complex<double> > &peps,const Walker 
 }
 
 /**
+ * fill the SL_PEPS object by contracting a peps with a walker
+ * @param option == 'H' keep regular order of indices
+ * @param peps input PEPS<> object
+ * @param walker the Walker object
+ */
+void SL_PEPS::fill(char option,const PEPS< complex<double> > &peps,TArray<complex<double>,2> &O,const Walker &walker){
+
+   complex<double> one(1.0,0.0);
+   complex<double> zero(0.0,0.0);
+
+   if(option == 'H'){
+
+      TArray<complex<double>,1> vec(d);
+
+      for(int r = 0;r < Ly;++r)
+         for(int c = 0;c < Lx;++c){
+
+            //first act with O on walker
+            blas::gemv(CblasRowMajor, CblasTrans, d, d , one, O.data(), d , walker(r,c).data(), 1, zero, vec.data(), 1);
+
+            int dim = (*this)[r*Lx +c].size();
+
+            blas::gemv(CblasRowMajor, CblasTrans, d, dim , one, peps(r,c).data(), dim , vec.data(), 1, zero, (*this)[r*Lx + c].data(), 1);
+
+         }
+
+   }
+   else{//VERTICAL!
+
+      TArray<complex<double>,4> tmp;
+      TArray<complex<double>,1> vec(d);
+
+      for(int r = 0;r < Ly;++r)
+         for(int c = 0;c < Lx;++c){
+
+            //first act with O on walker
+            blas::gemv(CblasRowMajor, CblasTrans, d, d , one, O.data(), d , walker(r,c).data(), 1, zero, vec.data(), 1);
+
+            int dim = (*this)[r*Lx +c].size();
+
+            tmp.resize(peps(r,c).shape(1),peps(r,c).shape(2),peps(r,c).shape(3),peps(r,c).shape(4));
+
+            blas::gemv(CblasRowMajor, CblasTrans, d, dim , one, peps(r,c).data(), dim , vec.data(), 1, zero, tmp.data(), 1);
+
+            //PERMUTE!!
+            Permute(tmp,shape(2,3,0,1),(*this)[r*Lx + c]);
+
+         }
+
+   }
+
+}
+
+/**
  * access to the individual tensors: const version
  * @param r row index
  * @param c col index
