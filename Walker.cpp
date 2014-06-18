@@ -301,45 +301,37 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
          blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::U(0,col).data(),N,zero,LSx.data(),N);
 
       }
-      /*
-      //last site of bottom row:close down the left +,- and z
+      
+      //last site of bottom row:close down the left x,y and z
 
-      //1) Sm to close down Lp
-      Environment::construct_double_layer('H',peps(0,Lx-1),Sm,dlsm);
+      //1) Sx to close down LSx
+      Contract(one,Environment::t[0][Lx-1],shape(1),Environment::Sx(0,Lx-1),shape(1),zero,tmp5);
 
-      //tmp comes out index (t,b)
-      tmp.clear();
-      Contract(1.0,Environment::t[0][Lx - 1],shape(1),dlsm,shape(1),0.0,tmp);
+      R[Lx-2] = tmp5.reshape_clear(shape(Environment::t[0][Lx-1].shape(0),Environment::Sx(0,Lx-1).shape(0)));
 
-      //reshape tmp to a 2-index array
-      R[Lx - 3] = tmp.reshape_clear(shape(Environment::t[0][Lx - 1].shape(0),dlsm.shape(0)));
+      energy += Dot(LSx,R[Lx-2]);
 
-      val += 0.5 * Dot(Lp,R[Lx-3]);
+      dim = R[Lx-2].size();
+      auxvec[Lx-1][0] = blas::dot(dim,LSx.data(),1,R[Lx-2].data(),1);
 
-      //2) Sp to close down Lm
-      Environment::construct_double_layer('H',peps(0,Lx-1),Sp,dlsp);
+      //2) Sy to close down Ly
+      Contract(one,Environment::t[0][Lx-1],shape(1),Environment::Sy(0,Lx-1),shape(1),zero,tmp5);
 
-      //tmp comes out index (t,b)
-      tmp.clear();
-      Contract(1.0,Environment::t[0][Lx - 1],shape(1),dlsp,shape(1),0.0,tmp);
+      R[Lx-2] = tmp5.reshape_clear(shape(Environment::t[0][Lx-1].shape(0),Environment::Sy(0,Lx-1).shape(0)));
 
-      //reshape tmp to a 2-index array
-      R[Lx - 3] = tmp.reshape_clear(shape(Environment::t[0][Lx - 1].shape(0),dlsp.shape(0)));
+      energy += Dot(LSy,R[Lx-2]);
 
-      val += 0.5 * Dot(Lm,R[Lx-3]);
+      auxvec[Lx-1][0] = blas::dot(dim,LSy.data(),1,R[Lx-2].data(),1);
 
       //3) Sz to close down Lz
-      Environment::construct_double_layer('H',peps(0,Lx-1),Sz,dlsz);
+      Contract(one,Environment::t[0][Lx-1],shape(1),Environment::Sz(0,Lx-1),shape(1),zero,tmp5);
 
-      //tmp comes out index (t,b)
-      tmp.clear();
-      Contract(1.0,Environment::t[0][Lx - 1],shape(1),dlsz,shape(1),0.0,tmp);
+      R[Lx-2] = tmp5.reshape_clear(shape(Environment::t[0][Lx-1].shape(0),Environment::Sz(0,Lx-1).shape(0)));
 
-      //reshape tmp to a 2-index array
-      R[Lx - 3] = tmp.reshape_clear(shape(Environment::t[0][Lx - 1].shape(0),dlsz.shape(0)));
+      energy += Dot(LSz,R[Lx-2]);
 
-      val += Dot(Lz,R[Lx-3]);
-
+      auxvec[Lx-1][0] = blas::dot(dim,LSz.data(),1,R[Lx-2].data(),1);
+/*
       // -- (2) -- now move from bottom to top calculating everything like an MPO/MPS expectation value
 
       //Right renormalized operators
