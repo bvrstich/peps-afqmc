@@ -45,10 +45,10 @@ namespace global{
       //Sx
       Sx.resize(d,d);
 
-      Sx(0,0) = complex<double>(0.0,0.0);
-      Sx(0,1) = complex<double>(0.5,0.0);
-      Sx(1,0) = complex<double>(0.5,0.0);
-      Sx(1,1) = complex<double>(0.0,0.0);
+      Sx(0,0) = complex<double>(1.0,0.0);
+      Sx(0,1) = complex<double>(0.0,0.0);
+      Sx(1,0) = complex<double>(0.0,0.0);
+      Sx(1,1) = complex<double>(1.0,0.0);
 
       //Sy
       Sy.resize(d,d);
