@@ -37,7 +37,6 @@ namespace global {
    //!intermediate storage for calculation of auxiliary operator expectation values
    extern vector< vector< complex<double> > > auxvec;
 
-
    void init(int,int,int);
 
    template<typename T>

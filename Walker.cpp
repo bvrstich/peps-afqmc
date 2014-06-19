@@ -631,121 +631,152 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
       auxvec[(Ly-1)*Lx][1] = blas::dot(dim,LSy.data(),1,R[0].data(),1);
       auxvec[(Ly-1)*Lx][2] = blas::dot(dim,LSz.data(),1,R[0].data(),1);
 
-      cout << endl;
-      cout << auxvec[(Ly-1)*Lx][0] << endl;
-      cout << auxvec[(Ly-1)*Lx][1] << endl;
-      cout << auxvec[(Ly-1)*Lx][2] << endl;
-      cout << endl;
-/*
       //middle of the chain:
-      //for(int col = 1;col < Lx-1;++col){
-      int col = 1;
+      for(int col = 1;col < Lx-1;++col){
 
-      //first close down the x,y and z terms from the previous site for the energy
+         //first close down the x,y and z terms from the previous site for the energy
 
-      //construct the right intermediate contraction (paste bottom to right)
-      tmp3.clear();
-      Contract(one,Environment::b[Ly-2][col],shape(2),R[col],shape(1),zero,tmp3);
+         //construct the right intermediate contraction (paste bottom to right)
+         tmp3.clear();
+         Contract(one,Environment::b[Ly-2][col],shape(2),R[col],shape(1),zero,tmp3);
 
-      // 1) paste Sx to the right
-      int M = Environment::Sx(Ly-1,col).shape(0);
-      int N = tmp3.shape(0);
-      int K = tmp3.shape(1) * tmp3.shape(2);
+         // 1) paste Sx to the right
+         int M = Environment::Sx(Ly-1,col).shape(0);
+         int N = tmp3.shape(0);
+         int K = tmp3.shape(1) * tmp3.shape(2);
 
-      blas::gemm(CblasRowMajor, CblasNoTrans, CblasTrans, M, N, K, one, Environment::Sx(Ly-1,col).data(),K,tmp3.data(),K,zero,R[col-1].data(),N);
+         blas::gemm(CblasRowMajor, CblasNoTrans, CblasTrans, M, N, K, one, Environment::Sx(Ly-1,col).data(),K,tmp3.data(),K,zero,R[col-1].data(),N);
 
-      //contract with left Sx
-      energy += Dot(LSx,R[col - 1]);
+         //contract with left Sx
+         energy += Dot(LSx,R[col - 1]);
 
-      // 2) paste Sy to the right
-      M = Environment::Sy(Ly-1,col).shape(0);
-      N = tmp3.shape(0);
-      K = tmp3.shape(1) * tmp3.shape(2);
+         // 2) paste Sy to the right
+         M = Environment::Sy(Ly-1,col).shape(0);
+         N = tmp3.shape(0);
+         K = tmp3.shape(1) * tmp3.shape(2);
 
-      blas::gemm(CblasRowMajor, CblasNoTrans, CblasTrans, M, N, K, one, Environment::Sy(Ly-1,col).data(),K,tmp3.data(),K,zero,R[col-1].data(),N);
+         blas::gemm(CblasRowMajor, CblasNoTrans, CblasTrans, M, N, K, one, Environment::Sy(Ly-1,col).data(),K,tmp3.data(),K,zero,R[col-1].data(),N);
 
-      //contract with left Sy
-      energy += Dot(LSy,R[col - 1]);
+         //contract with left Sy
+         energy += Dot(LSy,R[col - 1]);
 
-      // 3) paste Sz to the right
-      M = Environment::Sz(Ly-1,col).shape(0);
-      N = tmp3.shape(0);
-      K = tmp3.shape(1) * tmp3.shape(2);
+         // 3) paste Sz to the right
+         M = Environment::Sz(Ly-1,col).shape(0);
+         N = tmp3.shape(0);
+         K = tmp3.shape(1) * tmp3.shape(2);
 
-      blas::gemm(CblasRowMajor, CblasNoTrans, CblasTrans, M, N, K, one, Environment::Sz(Ly-1,col).data(),K,tmp3.data(),K,zero,R[col-1].data(),N);
+         blas::gemm(CblasRowMajor, CblasNoTrans, CblasTrans, M, N, K, one, Environment::Sz(Ly-1,col).data(),K,tmp3.data(),K,zero,R[col-1].data(),N);
 
-      //contract with left Sy
-      energy += Dot(LSz,R[col - 1]);
+         //contract with left Sy
+         energy += Dot(LSz,R[col - 1]);
 
-      //construct left renormalized operators for next site: first paste bottom to Left unity
-      tmp3.clear();
-      Contract(one,LU,shape(1),Environment::b[Ly-2][col],shape(0),zero,tmp3);
+         //construct left renormalized operators for next site: first paste bottom to Left unity
+         tmp3.clear();
+         Contract(one,LU,shape(1),Environment::b[Ly-2][col],shape(0),zero,tmp3);
 
-      // 1) construct new Sx left operator
-      LSx.resize(Environment::Sx(Ly-1,col).shape(3),Environment::b[Ly-2][col].shape(2));
+         // 1) construct new Sx left operator
+         LSx.resize(Environment::Sx(Ly-1,col).shape(3),Environment::b[Ly-2][col].shape(2));
 
-      M = Environment::Sx(0,col).shape(3);
-      N = tmp3.shape(2);
-      K = tmp3.shape(0) * tmp3.shape(1);
+         M = Environment::Sx(0,col).shape(3);
+         N = tmp3.shape(2);
+         K = tmp3.shape(0) * tmp3.shape(1);
 
-      blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, Environment::Sx(Ly-1,col).data(),M,tmp3.data(),N,zero,LSx.data(),N);
+         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, Environment::Sx(Ly-1,col).data(),M,tmp3.data(),N,zero,LSx.data(),N);
 
-      // 2) construct new Sy left operator
-      LSy.resize(Environment::Sy(Ly-1,col).shape(3),Environment::b[Ly-2][col].shape(2));
-      blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, Environment::Sy(Ly-1,col).data(),M,tmp3.data(),N,zero,LSy.data(),N);
+         // 2) construct new Sy left operator
+         LSy.resize(Environment::Sy(Ly-1,col).shape(3),Environment::b[Ly-2][col].shape(2));
+         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, Environment::Sy(Ly-1,col).data(),M,tmp3.data(),N,zero,LSy.data(),N);
 
-      // 3) construct new Sz left operator
-      LSz.resize(Environment::Sz(Ly-1,col).shape(3),Environment::b[Ly-2][col].shape(2));
-      blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, Environment::Sz(Ly-1,col).data(),M,tmp3.data(),N,zero,LSx.data(),N);
+         // 3) construct new Sz left operator
+         LSz.resize(Environment::Sz(Ly-1,col).shape(3),Environment::b[Ly-2][col].shape(2));
+         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, Environment::Sz(Ly-1,col).data(),M,tmp3.data(),N,zero,LSz.data(),N);
 
-      // 4) finally construct new unity on the left
-      LU.resize(Environment::U(Ly-1,col).shape(3),Environment::b[Ly-2][col].shape(2));
-      blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, Environment::U(Ly-1,col).data(),M,tmp3.data(),N,zero,LU.data(),N);
+         // 4) finally construct new unity on the left
+         LU.resize(Environment::U(Ly-1,col).shape(3),Environment::b[Ly-2][col].shape(2));
+         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, Environment::t[Ly-2][col].data(),M,tmp3.data(),N,zero,LU.data(),N);
 
-      //now contract x,y and z with R for local expectation values:
-      auxvec[(Ly-1)*Lx + col][0] = blas::dot(dim,LSx.data(),1,R[col].data(),1);
-      auxvec[(Ly-1)*Lx + col][1] = blas::dot(dim,LSy.data(),1,R[col].data(),1);
-      auxvec[(Ly-1)*Lx + col][2] = blas::dot(dim,LSz.data(),1,R[col].data(),1);
+         //now contract x,y and z with R for local expectation values:
+         dim = R[col].size();
 
-      //}
+         auxvec[(Ly-1)*Lx + col][0] = blas::dot(dim,LSx.data(),1,R[col].data(),1);
+         auxvec[(Ly-1)*Lx + col][1] = blas::dot(dim,LSy.data(),1,R[col].data(),1);
+         auxvec[(Ly-1)*Lx + col][2] = blas::dot(dim,LSz.data(),1,R[col].data(),1);
+
+      }
+
       //finally close down on last top site
 
-      //1) Sm to close down Lp
-      Environment::construct_double_layer('H',peps(Ly-1,Lx-1),Sm,dlsm);
+      //first calculate overlap
+      overlap = Dot(LU,R[Lx-2]);
+
+      //1) Sx to close down LSx
 
       //tmp comes out index (t,b)
-      tmp.clear();
-      Contract(1.0,dlsm,shape(1),Environment::b[Ly-2][Lx - 1],shape(1),0.0,tmp);
+      tmp5.clear();
+      Contract(one,Environment::Sx(Ly-1,Lx-1),shape(2),Environment::b[Ly-2][Lx - 1],shape(1),zero,tmp5);
 
       //reshape tmp to a 2-index array
-      R[Lx - 3] = tmp.reshape_clear(shape(dlsm.shape(0),Environment::b[Ly-2][Lx - 1].shape(0)));
+      R[Lx - 2] = tmp5.reshape_clear(shape(Environment::Sx(Ly-1,Lx-1).shape(0),Environment::b[Ly-2][Lx - 1].shape(0)));
 
-      val += 0.5 * Dot(Lp,R[Lx-3]);
+      //energy
+      energy += Dot(LSx,R[Lx-2]);
 
-      //2) Sp to close down Lm
-      Environment::construct_double_layer('H',peps(Ly-1,Lx-1),Sp,dlsp);
+      //local expectation value
+      auxvec[(Ly-1)*Lx + Lx-1][0] = blas::dot(dim,LU.data(),1,R[Lx-2].data(),1);
 
-      //tmp comes out index (t,b)
-      tmp.clear();
-      Contract(1.0,dlsp,shape(1),Environment::b[Ly-2][Lx - 1],shape(1),0.0,tmp);
+      //2) Sy to close down Ly
+      Contract(one,Environment::Sy(Ly-1,Lx-1),shape(2),Environment::b[Ly-2][Lx - 1],shape(1),zero,tmp5);
 
       //reshape tmp to a 2-index array
-      R[Lx - 3] = tmp.reshape_clear(shape(dlsp.shape(0),Environment::b[Ly-2][Lx - 1].shape(0)));
+      R[Lx - 2] = tmp5.reshape_clear(shape(Environment::Sy(Ly-1,Lx-1).shape(0),Environment::b[Ly-2][Lx - 1].shape(0)));
 
-      val += 0.5 * Dot(Lm,R[Lx-3]);
+      //energy
+      energy += Dot(LSy,R[Lx-2]);
+
+      //local expectation value
+      auxvec[(Ly-1)*Lx + Lx-1][1] = blas::dot(dim,LU.data(),1,R[Lx-2].data(),1);
 
       //3) Sz to close down Lz
-      Environment::construct_double_layer('H',peps(Ly-1,Lx-1),Sz,dlsz);
 
       //tmp comes out index (t,b)
-      tmp.clear();
-      Contract(1.0,dlsz,shape(1),Environment::b[Ly-2][Lx - 1],shape(1),0.0,tmp);
+      Contract(one,Environment::Sz(Ly-1,Lx-1),shape(2),Environment::b[Ly-2][Lx - 1],shape(1),zero,tmp5);
 
       //reshape tmp to a 2-index array
-      R[Lx - 3] = tmp.reshape_clear(shape(dlsz.shape(0),Environment::b[Ly-2][Lx - 1].shape(0)));
+      R[Lx - 2] = tmp5.reshape_clear(shape(Environment::Sz(Ly-1,Lx-1).shape(0),Environment::b[Ly-2][Lx - 1].shape(0)));
 
-      val += Dot(Lz,R[Lx-3]);
-      */
+      //energy
+      energy += Dot(LSz,R[Lx-2]);
+
+      //local expectation value
+      auxvec[(Ly-1)*Lx + Lx-1][2] = blas::dot(dim,LU.data(),1,R[Lx-2].data(),1);
+
+      // #################################################################
+      // ### ----               SET THE PROPERTIES                ---- ### 
+      // #################################################################
+
+      cout << energy << endl;
+      cout << overlap << endl;
+
+      EL = energy/overlap;
+
+      cout << "ENERGY" << endl;
+      cout << endl;
+      cout << EL << endl;
+      cout << endl;
+
+      cout << "LOCAL EXPECTATION VALUES" << endl;
+
+      for(int row = 0;row < Ly;++row)
+         for(int col = 0;col < Lx;++col){
+
+            cout << endl;
+            cout << auxvec[row*Lx + col][0]/overlap << endl;
+            cout << auxvec[row*Lx + col][1]/overlap << endl;
+            cout << auxvec[row*Lx + col][2]/overlap << endl;
+            cout << endl;
+
+         }
+
    }
    else{//VERTICAL: Left to right
       /*

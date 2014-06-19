@@ -53,18 +53,18 @@ namespace global{
       //Sy
       Sy.resize(d,d);
 
-      Sy(0,0) = complex<double>(0.0,0.0);
-      Sy(0,1) = complex<double>(0.0,0.5);
-      Sy(1,0) = complex<double>(0.0,-0.5);
-      Sy(1,1) = complex<double>(0.0,0.0);
+      Sy(0,0) = complex<double>(1.0,0.0);
+      Sy(0,1) = complex<double>(0.0,0.0);
+      Sy(1,0) = complex<double>(0.0,0.0);
+      Sy(1,1) = complex<double>(1.0,0.0);
 
       //Sz
       Sz.resize(d,d);
 
-      Sz(0,0) = complex<double>(-0.5,0.0);
+      Sz(0,0) = complex<double>(1.0,0.0);
       Sz(0,1) = complex<double>(0.0,0.0);
       Sz(1,0) = complex<double>(0.0,0.0);
-      Sz(1,1) = complex<double>(0.5,0.0);
+      Sz(1,1) = complex<double>(1.0,0.0);
 
       auxvec.resize(Lx*Ly);
 
