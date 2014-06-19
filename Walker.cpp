@@ -283,11 +283,11 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
 
          // 2) construct new Sy left operator
          LSy.resize(Environment::t[0][col].shape(2),Environment::Sy(0,col).shape(3));
-         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::Sy(0,col).data(),N,zero,LSx.data(),N);
+         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::Sy(0,col).data(),N,zero,LSy.data(),N);
 
          // 3) construct new Sz left operator
          LSz.resize(Environment::t[0][col].shape(2),Environment::Sz(0,col).shape(3));
-         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::Sz(0,col).data(),N,zero,LSx.data(),N);
+         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::Sz(0,col).data(),N,zero,LSz.data(),N);
 
          //now contract x,y and z with R for local expectation values:
          dim = R[col].size();
@@ -298,10 +298,10 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
 
          // 4) finally construct new unity on the left
          LU.resize(Environment::t[0][col].shape(2),Environment::U(0,col).shape(3));
-         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::U(0,col).data(),N,zero,LSx.data(),N);
+         blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::U(0,col).data(),N,zero,LU.data(),N);
 
       }
-      
+
       //last site of bottom row:close down the left x,y and z
 
       //1) Sx to close down LSx
@@ -468,7 +468,7 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
 
             //3) finally close down LOSz with Sz
             I4bis.clear();
-            Contract(one,I4,shape(i,j,k,o),Environment::Sy(row,col),shape(m,j,n,k),zero,I4bis,shape(i,m,n,o));
+            Contract(one,I4,shape(i,j,k,o),Environment::Sz(row,col),shape(m,j,n,k),zero,I4bis,shape(i,m,n,o));
 
             Contract(one,I4bis,shape(2,3),Environment::b[row-1][col],shape(1,2),zero,RO[col-1]);
 
@@ -567,13 +567,13 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
          RO[Lx - 2] = tmp6.reshape_clear(shape(Environment::t[row][Lx - 1].shape(0),Environment::Sz(row,Lx-1).shape(0),Environment::b[row-1][Lx - 1].shape(0)));
 
          //add to value
-         energy += Dot(LOU,RO[Lx - 2]);
+         energy += Dot(LOSz,RO[Lx - 2]);
 
          //local expectation value
          auxvec[row*Lx + Lx-1][2] = blas::dot(dim,LOU.data(),1,RO[Lx-2].data(),1);
 
       }
-       
+
       // -- (3) -- || top row = Ly-1: again similar to overlap calculation
 
       //first construct the right renormalized operators
@@ -591,6 +591,7 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
          tmp3.clear();
          Contract(one,Environment::t[Ly-2][col],shape(2),R[col],shape(0),zero,tmp3);
 
+         R[col - 1].clear();
          Contract(one,tmp3,shape(1,2),Environment::b[Ly-2][col],shape(1,2),zero,R[col-1]);
 
       }
@@ -755,27 +756,16 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
       // #################################################################
 
       cout << energy << endl;
+      cout << endl;
       cout << overlap << endl;
 
       EL = energy/overlap;
 
+      cout << endl;
       cout << "ENERGY" << endl;
       cout << endl;
-      cout << EL << endl;
+      cout << EL*2.0 << endl;
       cout << endl;
-
-      cout << "LOCAL EXPECTATION VALUES" << endl;
-
-      for(int row = 0;row < Ly;++row)
-         for(int col = 0;col < Lx;++col){
-
-            cout << endl;
-            cout << auxvec[row*Lx + col][0]/overlap << endl;
-            cout << auxvec[row*Lx + col][1]/overlap << endl;
-            cout << auxvec[row*Lx + col][2]/overlap << endl;
-            cout << endl;
-
-         }
 
    }
    else{//VERTICAL: Left to right
