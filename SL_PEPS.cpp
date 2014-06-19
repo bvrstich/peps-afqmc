@@ -104,7 +104,7 @@ void SL_PEPS::fill(char option,const PEPS< complex<double> > &peps,const Walker 
 
    if(option == 'H'){
 
-      //reshape_horizontal();
+      reshape_horizontal();
 
       for(int r = 0;r < Ly;++r)
          for(int c = 0;c < Lx;++c){
@@ -151,7 +151,7 @@ void SL_PEPS::fill(char option,const PEPS< complex<double> > &peps,TArray<comple
 
    if(option == 'H'){
 
-      //reshape_horizontal();
+      reshape_horizontal();
 
       TArray<complex<double>,1> vec(d);
 
