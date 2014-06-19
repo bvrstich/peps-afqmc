@@ -40,7 +40,7 @@ int main(int argc,char *argv[]){
 
    Walker walker(10);
 
-   walker.calc_properties('H',peps);
+   walker.calc_properties('V',peps);
 /*
    double dtau = 0.01;
    int Nw = 100;
