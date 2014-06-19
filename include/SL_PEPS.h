@@ -42,9 +42,10 @@ class SL_PEPS : public vector< TArray<complex<double>,4> > {
 
       TArray<complex<double>,4> &operator()(int,int);
 
-
-
    private:
+
+      //!reshape SL_PEPS to a horizontal lattice
+      void reshape_horizontal();
 
       //!dimension of the bonds
       int D;

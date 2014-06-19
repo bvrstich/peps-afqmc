@@ -104,6 +104,8 @@ void SL_PEPS::fill(char option,const PEPS< complex<double> > &peps,const Walker 
 
    if(option == 'H'){
 
+      //reshape_horizontal();
+
       for(int r = 0;r < Ly;++r)
          for(int c = 0;c < Lx;++c){
 
@@ -148,6 +150,8 @@ void SL_PEPS::fill(char option,const PEPS< complex<double> > &peps,TArray<comple
    complex<double> zero(0.0,0.0);
 
    if(option == 'H'){
+
+      //reshape_horizontal();
 
       TArray<complex<double>,1> vec(d);
 
@@ -211,5 +215,46 @@ const TArray<complex<double>,4> &SL_PEPS::operator()(int r,int c) const {
 TArray<complex<double>,4> &SL_PEPS::operator()(int r,int c) {
 
    return (*this)[r*Lx + c];
+
+}
+
+void SL_PEPS::reshape_horizontal(){
+
+   //corners first
+
+   //r == 0 : c == 0
+   (*this)[ 0 ] = (*this)[ 0 ].reshape(shape(1,D,1,D));
+
+   //r == 0 : c == L - 1
+   (*this)[ Lx - 1 ] = (*this)[ Lx - 1 ].reshape(shape(D,D,1,1));
+
+   //r == L - 1 : c == 0
+   (*this)[ (Ly-1)*Lx ] = (*this)[ (Ly-1)*Lx ].reshape(shape(1,1,D,D));
+
+   //r == L - 1 : c == L - 1
+   (*this)[ (Ly-1)*Lx + Lx - 1 ] = (*this)[ (Ly-1)*Lx + Lx - 1 ].reshape(shape(D,1,D,1));
+
+   //sides:
+
+   //r == 0
+   for(int c = 1;c < Lx - 1;++c)
+      (*this)[ c ] = (*this)[ c ].reshape(shape(D,D,1,D));
+
+   //r == Ly - 1
+   for(int c = 1;c < Lx - 1;++c)
+      (*this)[ (Ly-1)*Lx + c ] = (*this)[ (Ly-1)*Lx + c ].reshape(shape(D,1,D,D));
+
+   //c == 0
+   for(int r = 1;r < Ly - 1;++r)
+      (*this)[ r*Lx ] = (*this)[ r*Lx ].reshape(shape(1,D,D,D));
+
+   //c == Lx - 1
+   for(int r = 1;r < Ly - 1;++r)
+      (*this)[ r*Lx + Lx - 1 ] = (*this)[ r*Lx + Lx - 1 ].reshape(shape(D,D,D,1));
+
+   //the rest is full
+   for(int r = 1;r < Ly - 1;++r)
+      for(int c = 1;c < Lx - 1;++c)
+         (*this)[ r*Lx + c ] = (*this)[ r*Lx + c ].reshape(shape(D,D,D,D));
 
 }
