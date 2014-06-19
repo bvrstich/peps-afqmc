@@ -758,6 +758,7 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
       EL = energy/overlap;
 
       //later do VL here...
+      cout << EL*2.0 << endl;
 
    }
    else{//VERTICAL: Left to right
@@ -881,11 +882,11 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
          blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::Sx(row,0).data(),N,zero,LSx.data(),N);
 
          // 2) construct new Sy left operator
-         LSy.resize(Environment::t[0][row].shape(2),Environment::Sy(row,0).shape(3));
+         LSy.resize(Environment::r[0][row].shape(2),Environment::Sy(row,0).shape(3));
          blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::Sy(row,0).data(),N,zero,LSy.data(),N);
 
          // 3) construct new Sz left operator
-         LSz.resize(Environment::t[0][row].shape(2),Environment::Sz(row,0).shape(3));
+         LSz.resize(Environment::r[0][row].shape(2),Environment::Sz(row,0).shape(3));
          blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::Sz(row,0).data(),N,zero,LSz.data(),N);
 
          //now contract x,y and z with R for local expectation values:
@@ -896,12 +897,12 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
          auxvec[row*Lx][2] = blas::dot(dim,LSz.data(),1,R[row].data(),1);
 
          // 4) finally construct new unity on the left
-         LU.resize(Environment::t[0][row].shape(2),Environment::U(row,0).shape(3));
+         LU.resize(Environment::r[0][row].shape(2),Environment::U(row,0).shape(3));
          blas::gemm(CblasRowMajor, CblasTrans, CblasNoTrans, M, N, K, one, tmp3.data(),M,Environment::U(row,0).data(),N,zero,LU.data(),N);
 
       }
 
-      //last site of left column :close down the left x,y and z
+      //last site of left column: close down the left x,y and z
 
       //1) Sx to close down LSx
       Contract(one,Environment::r[0][Ly-1],shape(1),Environment::Sx(Ly-1,0),shape(1),zero,tmp5);
@@ -1016,7 +1017,7 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
          Contract(one,tmp5,shape(3),Environment::l[col-1][0],shape(1),zero,tmp6);
 
          //move to a ZArray<3> object: order (top-env,peps-row,bottom-env)
-         LOSz = tmp6.reshape_clear(shape(Environment::r[col][0].shape(2),Environment::Sz(0,col).shape(3),Environment::t[col-1][0].shape(2)));
+         LOSz = tmp6.reshape_clear(shape(Environment::r[col][0].shape(2),Environment::Sz(0,col).shape(3),Environment::r[col-1][0].shape(2)));
 
          // 4) 1 -- finally construct left renormalized operator with unity
 
@@ -1356,9 +1357,6 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
 
       EL = energy/overlap;
       cout << EL*2.0 << endl;
-
-      //later do VL here...
-      cout << overlap << endl;
 
    }
     
