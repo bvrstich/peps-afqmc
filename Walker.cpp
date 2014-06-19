@@ -589,7 +589,7 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
       for(int col = Lx - 2;col > 0;--col){
 
          tmp3.clear();
-         Contract(one,Environment::t[Ly-2][col],shape(2),R[col-1],shape(0),zero,tmp3);
+         Contract(one,Environment::t[Ly-2][col],shape(2),R[col],shape(0),zero,tmp3);
 
          Contract(one,tmp3,shape(1,2),Environment::b[Ly-2][col],shape(1,2),zero,R[col-1]);
 
@@ -631,10 +631,11 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
       auxvec[(Ly-1)*Lx][1] = blas::dot(dim,LSy.data(),1,R[0].data(),1);
       auxvec[(Ly-1)*Lx][2] = blas::dot(dim,LSz.data(),1,R[0].data(),1);
 
+      cout << endl;
       cout << auxvec[(Ly-1)*Lx][0] << endl;
       cout << auxvec[(Ly-1)*Lx][1] << endl;
       cout << auxvec[(Ly-1)*Lx][2] << endl;
-
+      cout << endl;
 /*
       //middle of the chain:
       //for(int col = 1;col < Lx-1;++col){
