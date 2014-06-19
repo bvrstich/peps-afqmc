@@ -758,7 +758,6 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
       EL = energy/overlap;
 
       //later do VL here...
-      cout << EL*2.0 << endl;
 
    }
    else{//VERTICAL: Left to right
@@ -1356,7 +1355,6 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
       // #################################################################
 
       EL = energy/overlap;
-      cout << EL*2.0 << endl;
 
    }
     
