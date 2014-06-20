@@ -90,71 +90,73 @@ void Propagator::set(complex<double> x_in,int k_in,int r_in){
 /**
  * fill the propagator using a Trotter input object
  */
- /*
-void Propagator::fill(const Trotter &trotter) {
+void Propagator::fill() {
 
    if(r == 0){//x
 
-      for(int site = 0;site < L;++site){
+      for(int row = 0;row < Ly;++row)
+         for(int col = 0;col < Lx;++col){
 
-         blas::copy(size, trotter.gMx(0).data(), 1, (*this)[site].data(), 1);
+            blas::copy(d*d, Mx[0].data(), 1, (*this)[row*Lx + col].data(), 1);
 
-         double m = -0.5 * ( d - 1.0 );
+            double m = -0.5 * ( d - 1.0 );
 
-         blas::scal(size, exp(x * trotter.gV()(k,site) * m ) , (*this)[site].data(), 1);
+            blas::scal(d*d, exp(x * Trotter::gV()(k,row*Lx + col) * m ) , (*this)[row*Lx + col].data(), 1);
 
-         for(int i = 1;i < d;++i){
+            for(int i = 1;i < d;++i){
 
-            m++;
+               m++;
 
-            blas::axpy(size, exp(  x * trotter.gV()(k,site) * m ) , trotter.gMx(i).data(), 1, (*this)[site].data(), 1);
+               blas::axpy(d*d, exp(  x * Trotter::gV()(k,row*Lx + col) * m ) , Mx[i].data(), 1, (*this)[row*Lx + col].data(), 1);
+
+            }
 
          }
-
-      }
 
    }
    else if(r == 1){//y
 
-      for(int site = 0;site < L;++site){
+      for(int row = 0;row < Ly;++row)
+         for(int col = 0;col < Lx;++col){
 
-         blas::copy(size, trotter.gMy(0).data(), 1, (*this)[site].data(), 1);
+            blas::copy(d*d, My[0].data(), 1, (*this)[row*Lx + col].data(), 1);
 
-         double m = -0.5 * ( d - 1.0 );
+            double m = -0.5 * ( d - 1.0 );
 
-         blas::scal(size, exp(x * trotter.gV()(k,site) * m ) , (*this)[site].data(), 1);
+            blas::scal(d*d, exp(x * Trotter::gV()(k,row*Lx + col) * m ) , (*this)[row*Lx + col].data(), 1);
 
-         for(int i = 1;i < d;++i){
+            for(int i = 1;i < d;++i){
 
-            m++;
+               m++;
 
-            blas::axpy(size, exp(  x * trotter.gV()(k,site) * m ) , trotter.gMy(i).data(), 1, (*this)[site].data(), 1);
+               blas::axpy(d*d, exp(  x * Trotter::gV()(k,row*Lx + col) * m ) , My[i].data(), 1, (*this)[row*Lx + col].data(), 1);
+
+            }
 
          }
-
-      }
 
    }
    else{//z
 
-      for(int site = 0;site < L;++site){
+      for(int row = 0;row < Ly;++row)
+         for(int col = 0;col < Lx;++col){
 
-         blas::copy(size, trotter.gMz(0).data(), 1, (*this)[site].data(), 1);
+            blas::copy(d*d, Mz[0].data(), 1, (*this)[row*Lx + col].data(), 1);
 
-         double m = -0.5 * ( d - 1.0 );
+            double m = -0.5 * ( d - 1.0 );
 
-         blas::scal(size, exp(x * trotter.gV()(k,site) * m ) , (*this)[site].data(), 1);
+            blas::scal(d*d, exp(x * Trotter::gV()(k,row*Lx + col) * m ) , (*this)[row*Lx + col].data(), 1);
 
-         for(int i = 1;i < d;++i){
+            for(int i = 1;i < d;++i){
 
-            m++;
+               m++;
 
-            blas::axpy(size, exp(  x * trotter.gV()(k,site) * m ) , trotter.gMz(i).data(), 1, (*this)[site].data(), 1);
+               blas::axpy(d*d, exp(  x * Trotter::gV()(k,row*Lx + col) * m ) , Mz[i].data(), 1, (*this)[row*Lx + col].data(), 1);
+
+            }
 
          }
 
-      }
-
    }
+
 }
-*/

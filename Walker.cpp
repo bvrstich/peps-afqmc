@@ -21,6 +21,8 @@ using namespace global;
  */
 Walker::Walker() : std::vector< TArray<complex<double>,1> >( Lx * Ly ){
 
+   weight = 1.0;
+
    for(int r = 0;r < Ly;++r)
       for(int c = 0;c < Lx;++c){
 
@@ -119,6 +121,18 @@ const std::vector< complex<double> > &Walker::gVL() const{
 }
 
 /**
+ * access to the auxiliary field expectation values
+ * @param k trotter index
+ * @param r x,y or z
+ * @return VL(k,r)
+ */
+complex<double> Walker::gVL(int k,int r) const {
+
+   return VL[r*Trotter::n_trot + k];
+
+}
+
+/**
  * access to the individual tensors: const version
  * @param r row index
  * @param c col index
@@ -135,7 +149,7 @@ const TArray<complex<double>,1> &Walker::operator()(int r,int c) const {
  * @param option 'H' = horizontal sweep, 'V' is vertical
  * @param peps trial wave function represented as peps
  */
-complex<double> Walker::calc_properties(char option,const PEPS< complex<double> >& peps){
+void Walker::calc_properties(char option,const PEPS< complex<double> >& peps){
 
    // ---- || evaluate the expectation values in an MPO/MPS manner, first from bottom to top, then left to right || ----
 
@@ -1370,6 +1384,41 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
 
    }
 
-   return energy;
+}
+
+/**
+ * Apply the propagator (a D=1 MPO) to the current state of the walker. The walker is changed when calling this function
+ * @param P the propagator
+ */
+void Walker::propagate(const Propagator &P){
+
+   complex<double> one(1.0,0.0);
+   complex<double> zero(0.0,0.0);
+
+   TArray<complex<double>,1> tmp(d);
+
+   for(int i = 0;i < this->size();++i){
+
+      blas::gemv(CblasRowMajor,CblasNoTrans, d, d, one, P[i].data(), d, (*this)[i].data(), 1, zero, tmp.data(), 1);
+
+      (*this)[i] = std::move(tmp);
+
+   }
+
+}
+
+
+/** 
+ * normalize the walker state, will not physically effect the afqmc walk, just keeps the numbers from blowing up.
+ */
+void Walker::normalize(){
+
+   for(int i = 0;i < this->size();++i){
+
+      double nrm = blas::nrm2(d, (*this)[i].data(), 1);
+
+      blas::scal(d, static_cast< complex<double> >(1.0/nrm), (*this)[i].data(), 1);
+
+   }
 
 }

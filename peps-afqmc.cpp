@@ -15,6 +15,8 @@ using std::vector;
 
 #include "include.h"
 
+using namespace global;
+
 int main(int argc,char *argv[]){
 
    cout.precision(15);
@@ -32,7 +34,7 @@ int main(int argc,char *argv[]){
    Environment::init(D,D_aux);
 
    //set trotter terms on Heisenberg model
-   double dtau = 0.001;
+   double dtau = 0.00001;
 
    Trotter::heisenberg(dtau);
 
@@ -45,18 +47,47 @@ int main(int argc,char *argv[]){
 
    Walker walker;
 
-   walker.calc_properties('V',peps);
-/*
+   //set the values
+   Propagator P;
+
+   //now loop over the auxiliary fields:
    for(int k = 0;k < Trotter::n_trot;++k)
-      for(int r = 0;r < 3;++r)
-         cout << "(" << k << "," << r << ")\t|\t" << walker.gVL()[r*Trotter::n_trot + k] << endl;
+      for(int r = 0;r < 3;++r){
+
+         double x = RN.normal();
+
+         complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
+
+         //set the values
+         P.set(x + shift,k,r);
+
+         //and fill the propagator
+         P.fill();
+
+         //and apply it to the walker:
+         walker.propagate(P);
+
+      }
+
+   walker.normalize();
+
+   Environment::U.fill('H',peps,walker);
+
+   Environment::calc_env('H',peps,walker);
+   Environment::test_env();
+
+/*
+   walker.calc_properties('H',peps);
+
+   cout << walker.gEL() << endl;
+   cout << walker.gOverlap() << endl;
 */
    /*
-   int Nw = 100;
+      int Nw = 1;
 
-   AFQMC afqmc(mps,dtau,Nw);
-   afqmc.walk(100);
-*/
+      AFQMC afqmc(peps,Nw);
+      afqmc.walk(1);
+    */
    return 0;
 
 }

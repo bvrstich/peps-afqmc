@@ -13,6 +13,7 @@ using namespace btas;
 
 #include "PEPS.h"
 
+class Propagator;
 
 /**
  * class definition of Walker, made to describe the product state walkers. An array of L size-2 vector. Each site represents a rotation of the spin.
@@ -36,17 +37,21 @@ class Walker : public vector< TArray<complex<double>,1> > {
 
       void multWeight(double);
 
-      complex<double> calc_properties(char,const PEPS< complex<double> > &);
+      void calc_properties(char,const PEPS< complex<double> > &);
    
       complex<double> gOverlap() const;
 
       complex<double> gEL() const;
+
+      void normalize();
 
       const std::vector< complex<double> > &gVL() const;
 
       complex<double> gVL(int,int) const;
 
       const TArray<complex<double>,1> &operator()(int r,int c) const;
+
+      void propagate(const Propagator &);
 
   private:
 

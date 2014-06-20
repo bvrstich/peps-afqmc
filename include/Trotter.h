@@ -20,14 +20,13 @@ class Trotter {
       //!the number of non-zero eigenvalues of the coupling matrix: equals the number of trotter product terms
       static int n_trot;
 
+      //!The time step
+      static double dtau;
+
    private:
    
       //!the transformation matrix
       static TArray<complex<double>,2> V;
-
-
-      //!The time step
-      static double dtau;
 
 };
 
