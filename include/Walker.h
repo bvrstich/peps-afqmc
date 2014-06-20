@@ -24,9 +24,6 @@ class Walker : public vector< TArray<complex<double>,1> > {
       //empty contstructor
       Walker();
    
-      //Constructor
-      Walker(int);
- 
       //Constructor copying an entire Walker
       Walker(const Walker &walker);
       
@@ -43,8 +40,6 @@ class Walker : public vector< TArray<complex<double>,1> > {
    
       complex<double> gOverlap() const;
 
-      int gn_trot() const;
-
       complex<double> gEL() const;
 
       const std::vector< complex<double> > &gVL() const;
@@ -55,9 +50,6 @@ class Walker : public vector< TArray<complex<double>,1> > {
 
   private:
 
-      //!nr of trotter terms in expansion
-      int n_trot;
-   
       //!The walker weight
       double weight;
 

@@ -31,6 +31,11 @@ int main(int argc,char *argv[]){
    //and some static objects
    Environment::init(D,D_aux);
 
+   //set trotter terms on Heisenberg model
+   double dtau = 0.001;
+
+   Trotter::heisenberg(dtau);
+
    //read in the trial state
    char filename[200];
    sprintf(filename,"input/%dx%d/D=%d",L,L,D);
@@ -38,12 +43,15 @@ int main(int argc,char *argv[]){
    PEPS< complex<double> > peps;
    peps.load(filename);
 
-   Walker walker(10);
+   Walker walker;
 
-   walker.calc_properties('H',peps);
    walker.calc_properties('V',peps);
 /*
-   double dtau = 0.01;
+   for(int k = 0;k < Trotter::n_trot;++k)
+      for(int r = 0;r < 3;++r)
+         cout << "(" << k << "," << r << ")\t|\t" << walker.gVL()[r*Trotter::n_trot + k] << endl;
+*/
+   /*
    int Nw = 100;
 
    AFQMC afqmc(mps,dtau,Nw);

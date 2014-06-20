@@ -18,3 +18,5 @@
 
 #include "Environment.h"
 #include "compress.h"
+
+#include "Trotter.h"

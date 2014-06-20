@@ -16,17 +16,10 @@ using std::endl;
 using namespace global;
 
 /**
- * empty constructor:
- */
-Walker::Walker() : std::vector< TArray<complex<double>,1> >( Lx * Ly ){ }
-
-/**
  * construct a Walker object: initialize on AF state
  * @param n_trot_in number of trotter terms
  */
-Walker::Walker(int n_trot_in) : std::vector< TArray<complex<double>,1> >( Lx * Ly ){
-
-   this->n_trot = n_trot_in;
+Walker::Walker() : std::vector< TArray<complex<double>,1> >( Lx * Ly ){
 
    for(int r = 0;r < Ly;++r)
       for(int c = 0;c < Lx;++c){
@@ -48,7 +41,7 @@ Walker::Walker(int n_trot_in) : std::vector< TArray<complex<double>,1> >( Lx * L
 
       }
 
-   VL.resize(3*n_trot);
+   VL.resize(3*Trotter::n_trot);
 
 }
 
@@ -59,7 +52,6 @@ Walker::Walker(int n_trot_in) : std::vector< TArray<complex<double>,1> >( Lx * L
 Walker::Walker(const Walker &walker) : std::vector< TArray<complex<double>,1> >(walker) {
 
    this->weight = walker.gWeight();
-   this->n_trot = walker.gn_trot();
    this->overlap = walker.gOverlap();
    this->EL = walker.gEL();
    this->VL = walker.gVL();
@@ -98,15 +90,6 @@ void Walker::sWeight(double new_weight){
 
 }
 
-
-/** 
- * @return the number of trotter terms
- */
-int Walker::gn_trot() const {
-
-   return n_trot;
-
-}
 
 /** 
  * @return the overlap of the walker with the Trial
@@ -757,11 +740,24 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
 
       EL = energy/overlap;
 
-      //later do VL here...
+      //set VL: Sx, Sy and Sz on every site: ready to construct auxiliary expectation values quickly!
+      for(int k = 0;k < Trotter::n_trot;++k)
+         for(int r = 0;r < 3;++r){
+
+            VL[r*Trotter::n_trot + k] = auxvec[0][r] * Trotter::gV()(k,0);
+
+
+            for(int row = 0;row < Ly;++row)
+               for(int col = 0;col < Lx;++col)
+                  VL[r*Trotter::n_trot + k] += auxvec[row*Lx + col][r] * Trotter::gV()(k,row*Lx + col);
+
+            VL[r*Trotter::n_trot + k] /= overlap;
+
+         }
 
    }
    else{//VERTICAL: Left to right
-     
+
       // #################################################################
       // ### ---- from left to right: contract in mps/mpo fashion ---- ### 
       // #################################################################
@@ -1356,8 +1352,24 @@ complex<double> Walker::calc_properties(char option,const PEPS< complex<double> 
 
       EL = energy/overlap;
 
+      //set VL: Sx, Sy and Sz on every site: ready to construct auxiliary expectation values quickly!
+      for(int k = 0;k < Trotter::n_trot;++k)
+         for(int r = 0;r < 3;++r){
+
+            VL[r*Trotter::n_trot + k] = auxvec[0][r] * Trotter::gV()(k,0);
+
+
+            for(int row = 0;row < Ly;++row)
+               for(int col = 0;col < Lx;++col)
+                  VL[r*Trotter::n_trot + k] += auxvec[row*Lx + col][r] * Trotter::gV()(k,row*Lx + col);
+
+            VL[r*Trotter::n_trot + k] /= overlap;
+
+         }
+
+
    }
-    
+
    return energy;
 
 }
