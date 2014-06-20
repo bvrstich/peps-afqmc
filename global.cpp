@@ -23,6 +23,12 @@ namespace global{
 
    std::vector< std::vector< complex<double> > > auxvec;
 
+   std::vector< TArray<complex<double>,2> > Mx;
+
+   std::vector< TArray<complex<double>,2> > My;
+
+   std::vector< TArray<complex<double>,2> > Mz;
+
    int Lx;
    int Ly;
 
@@ -70,6 +76,54 @@ namespace global{
 
       for(int i = 0;i < auxvec.size();++i)//for x,y and z components
          auxvec[i].resize(3);
+
+      //now construct the propagating operators
+
+      //Sx
+      TArray<double,1> eig(d);
+      TArray<complex<double>,2> U(Sx);
+
+      lapack::heev(CblasRowMajor, 'V', 'U', d, U.data(), d, eig.data());
+
+      Mx.resize(d);
+
+      for(int i = 0;i < d;++i){
+
+         Mx[i].resize(d,d);
+
+         for(int j = 0;j < d;++j)
+            for(int k = 0;k < d;++k)
+               Mx[i](j,k) = U(j,i) * std::conj(U(k,i));
+
+      }
+
+      //Sy
+      U = Sy;
+      lapack::heev(CblasRowMajor, 'V', 'U', d, U.data(), d, eig.data());
+
+      My.resize(d);
+
+      for(int i = 0;i < d;++i){
+
+         My[i].resize(d,d);
+
+         for(int j = 0;j < d;++j)
+            for(int k = 0;k < d;++k)
+               My[i](j,k) = U(j,i) * std::conj(U(k,i));
+
+      }
+
+      //Sz
+      Mz.resize(d);
+
+      for(int i = 0;i < d;++i){
+
+         Mz[i].resize(d,d);
+         Mz[i] = 0.0;
+
+         Mz[i](i,i) = 1.0;
+
+      }
 
    }
 

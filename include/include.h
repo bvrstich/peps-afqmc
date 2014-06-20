@@ -20,3 +20,5 @@
 #include "compress.h"
 
 #include "Trotter.h"
+#include "Propagator.h"
+#include "AFQMC.h"

@@ -41,6 +41,15 @@ namespace global {
 
    template<typename T>
       T rgen();
+   
+   //!eigenvector of Sx |Sx><Sx|
+   extern std::vector< TArray<complex<double>,2> > Mx;
+
+   //!eigenvector of Sy |Sy><Sy|
+   extern std::vector< TArray<complex<double>,2> > My;
+
+   //!eigenvector of Sz |Sz><Sz|
+   extern std::vector< TArray<complex<double>,2> > Mz;
 
 };
 
