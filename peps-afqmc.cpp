@@ -49,17 +49,17 @@ int main(int argc,char *argv[]){
 
    //set the values
    Propagator P;
-
+/*
    //now loop over the auxiliary fields:
    for(int k = 0;k < Trotter::n_trot;++k)
       for(int r = 0;r < 3;++r){
-
+*/
          double x = RN.normal();
 
          complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
 
          //set the values
-         P.set(x + shift,k,r);
+         P.set(x + shift,0,1);
 
          //and fill the propagator
          P.fill();
@@ -67,7 +67,7 @@ int main(int argc,char *argv[]){
          //and apply it to the walker:
          walker.propagate(P);
 
-      }
+      //}
 
    walker.normalize();
 
