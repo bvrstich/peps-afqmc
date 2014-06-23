@@ -480,7 +480,7 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
    std::vector< TArray<complex<double>,2> > LO(L - 1);
 
    compress::init_ro(Right,RO,mps,*this);
-
+/*
    int iter = 0;
 
    while(iter < n_iter){
@@ -568,7 +568,7 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
       ++iter;
 
    }
-
+*/
    this->D = Dc;
 
 }

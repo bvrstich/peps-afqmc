@@ -34,7 +34,7 @@ int main(int argc,char *argv[]){
    Environment::init(D,D_aux);
 
    //set trotter terms on Heisenberg model
-   double dtau = 0.00001;
+   double dtau = 0.01;
 
    Trotter::heisenberg(dtau);
 
@@ -59,7 +59,7 @@ int main(int argc,char *argv[]){
          complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
 
          //set the values
-         P.set(x + shift,0,1);
+         P.set(x + shift,0,0);
 
          //and fill the propagator
          P.fill();
@@ -74,15 +74,14 @@ int main(int argc,char *argv[]){
    Environment::U.fill('H',peps,walker);
 
    Environment::calc_env('H',peps,walker);
+   /*
    Environment::test_env();
 
-/*
    walker.calc_properties('H',peps);
 
    cout << walker.gEL() << endl;
    cout << walker.gOverlap() << endl;
-*/
-   /*
+
       int Nw = 1;
 
       AFQMC afqmc(peps,Nw);
