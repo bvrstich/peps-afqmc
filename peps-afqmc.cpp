@@ -54,7 +54,7 @@ int main(int argc,char *argv[]){
    for(int k = 0;k < Trotter::n_trot;++k)
       for(int r = 0;r < 3;++r){
 */
-         double x = RN.normal();
+         double x = 0.5;//RN.normal();
 
          complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
 

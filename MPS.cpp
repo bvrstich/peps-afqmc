@@ -482,15 +482,20 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
    compress::init_ro(Right,RO,mps,*this);
    compress::init_ro(Left,LO,mps,*this);
 
-   complex<double> ward(0.0,0.0);
+   cout << endl;
+   for(int i = 0;i < L-1;++i){
 
-   for(int i = 0;i < RO[0].shape(0);++i)
-      for(int j = 0;j < RO[0].shape(1);++j)
-         ward += RO[0](i,j) * LO[0](j,i);
+      complex<double> ward(0.0);
 
-   cout << ward << endl;
+      for(int j = 0;j < RO[i].shape(0);++j)
+         for(int k = 0;k < RO[i].shape(1);++k)
+            ward += RO[i](j,k) * LO[i](k,j);
 
-/*
+      cout << ward << endl;
+
+   }
+   cout << endl;
+
    int iter = 0;
 
 //   while(iter < n_iter){
@@ -499,7 +504,7 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
       (*this)[0].clear();
 
       Contract(one,mps[0],shape(2),RO[0],shape(1),zero,(*this)[0]);
-
+/*
       //QR
       Geqrf((*this)[0],RO[0]);
 

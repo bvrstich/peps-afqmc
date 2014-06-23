@@ -106,7 +106,7 @@ void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const
          //compress in sweeping fashion
          b[r].compress(D_aux,tmp,1);
 
-         cout << b[r].dot(tmp) << endl;
+         cout << tmp.dot(b[r]) << endl;
 
 /*
       //}
