@@ -480,10 +480,20 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
    std::vector< TArray<complex<double>,2> > LO(L - 1);
 
    compress::init_ro(Right,RO,mps,*this);
+   compress::init_ro(Left,LO,mps,*this);
+
+   complex<double> ward(0.0,0.0);
+
+   for(int i = 0;i < RO[0].shape(0);++i)
+      for(int j = 0;j < RO[0].shape(1);++j)
+         ward += RO[0](i,j) * LO[0](j,i);
+
+   cout << ward << endl;
+
 /*
    int iter = 0;
 
-   while(iter < n_iter){
+//   while(iter < n_iter){
 
       //first site
       (*this)[0].clear();
@@ -567,7 +577,7 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
       ++iter;
 
-   }
+ //  }
 */
    this->D = Dc;
 
