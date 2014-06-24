@@ -498,8 +498,6 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
    //while(iter < n_iter){
 
       //first site
-      Contract(one,mps[0],shape(2),RO[0],shape(1),zero,(*this)[0]);
-
       int M = mps[0].shape(1);
       int N = RO[0].shape(0);
       int K = mps[0].shape(2);
@@ -522,32 +520,44 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
       (*this)[1] = std::move(tmp);
 
-/*
       compress::update_L(0,LO,mps,*this);
 
-      for(int i = 1;i < L - 1;++i){
+//      for(int i = 1;i < L - 1;++i){
+      int i = 1;
 
-         TArray<complex<double>,3> I;
+      M = mps[i].shape(0) * mps[i].shape(1);
+      N = RO[i].shape(0);
+      K = RO[i].shape(1);
 
-         Contract(one,mps[i],shape(2),RO[i],shape(1),zero,I);
+      tmp.resize(shape(mps[i].shape(0),mps[i].shape(1),N));
 
-         (*this)[i].clear();
+      blas::gemm(CblasRowMajor,CblasNoTrans,CblasConjTrans, M, N, K, one, mps[i].data(),K,RO[i].data(),K,zero,tmp.data(),N);
 
-         Contract(one,LO[i - 1],shape(1),I,shape(0),zero,(*this)[i]);
+      M = LO[i-1].shape(0);
+      N = tmp.shape(1)*tmp.shape(2);
+      K = tmp.shape(0);
 
-         Geqrf((*this)[i],RO[i]);
+      (*this)[i].resize(shape(LO[i-1].shape(0),mps[i].shape(1),RO[i].shape(0)));
 
-         //paste to next matrix
-         tmp.clear();
+      blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, LO[i-1].data(),K,tmp.data(),N,zero,(*this)[i].data(),N);
 
-         Contract(one,RO[i],shape(1),(*this)[i + 1],shape(0),zero,tmp);
+      Geqrf((*this)[i],RO[i]);
 
-         (*this)[i + 1] = std::move(tmp);
+      //paste to next matrix
+      M = RO[i].shape(0);
+      N = (*this)[i+1].shape(1) * (*this)[i+1].shape(2);
+      K = RO[i].shape(1);
 
-         compress::update_L(i,LO,mps,*this);
+      tmp.resize(shape(M,(*this)[1].shape(1),(*this)[1].shape(2)));
 
-      }
+      blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, RO[i].data(),K,(*this)[i+1].data(),N,zero,tmp.data(),N);
 
+      (*this)[i+1] = std::move(tmp);
+
+      compress::update_L(i,LO,mps,*this);
+
+      //      }
+/*
       //and backward!
       (*this)[L - 1].clear();
 
@@ -567,32 +577,32 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
       for(int i = L - 2;i > 0;--i){
 
-         TArray<complex<double>,3> I;
+      TArray<complex<double>,3> I;
 
-         Contract(one,mps[i],shape(2),RO[i],shape(1),zero,I);
+      Contract(one,mps[i],shape(2),RO[i],shape(1),zero,I);
 
-         (*this)[i].clear();
+      (*this)[i].clear();
 
-         Contract(one,LO[i - 1],shape(1),I,shape(0),zero,(*this)[i]);
+      Contract(one,LO[i - 1],shape(1),I,shape(0),zero,(*this)[i]);
 
-         Gelqf(LO[i],(*this)[i]);
+      Gelqf(LO[i],(*this)[i]);
 
-         //paste to previous matrix
-         tmp.clear();
+      //paste to previous matrix
+      tmp.clear();
 
-         Contract(one,(*this)[i - 1],shape(2),LO[i],shape(0),zero,tmp);
+      Contract(one,(*this)[i - 1],shape(2),LO[i],shape(0),zero,tmp);
 
-         (*this)[i - 1] = std::move(tmp);
+      (*this)[i - 1] = std::move(tmp);
 
-         compress::update_R(i,RO,mps,*this);
+      compress::update_R(i,RO,mps,*this);
 
       }
 
       ++iter;
 
-   }
-*/
-   this->D = Dc;
+      }
+       */
+      this->D = Dc;
 
 }
 

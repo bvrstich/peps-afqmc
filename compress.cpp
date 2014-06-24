@@ -31,36 +31,36 @@ namespace compress {
 
       ro.resize(L - 1);
 
-      //for Left to right bra is on top!
+      //for Left to right: make ket complex conjugate
       if(dir == Left){
 
-         int M = bra[0].shape(2);
-         int N = ket[0].shape(2);
-         int K = ket[0].shape(0) * ket[0].shape(1);
+         int M = ket[0].shape(2);
+         int N = bra[0].shape(2);
+         int K = bra[0].shape(0) * bra[0].shape(1);
 
          ro[0].resize(shape(M,N));
 
-         blas::gemm(CblasRowMajor,CblasConjTrans,CblasNoTrans, M, N, K, one, bra[0].data(),M,ket[0].data(),N,zero,ro[0].data(),N);
+         blas::gemm(CblasRowMajor,CblasConjTrans,CblasNoTrans, M, N, K, one, ket[0].data(),M,bra[0].data(),N,zero,ro[0].data(),N);
 
          TArray<complex<double>,3> I;
 
          for(int i = 1;i < L - 1;++i){
 
             M = ro[i-1].shape(0);
-            N = ket[i].shape(1) * ket[i].shape(2);
+            N = bra[i].shape(1) * bra[i].shape(2);
             K = ro[i-1].shape(1);
 
-            I.resize(shape(M,ket[i].shape(1),ket[i].shape(2)));
+            I.resize(shape(M,bra[i].shape(1),bra[i].shape(2)));
 
-            blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, ro[i-1].data(),K,ket[i].data(),N,zero,I.data(),N);
+            blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, ro[i-1].data(),K,bra[i].data(),N,zero,I.data(),N);
 
-            M = bra[i].shape(2);
-            N = ket[i].shape(2);
-            K = bra[i].shape(0) * bra[i].shape(1);
+            M = ket[i].shape(2);
+            N = bra[i].shape(2);
+            K = ket[i].shape(0) * ket[i].shape(1);
 
             ro[i].resize(shape(M,N));
 
-            blas::gemm(CblasRowMajor,CblasConjTrans,CblasNoTrans, M, N, K, one, bra[i].data(),M,I.data(),N,zero,ro[i].data(),N);
+            blas::gemm(CblasRowMajor,CblasConjTrans,CblasNoTrans, M, N, K, one, ket[i].data(),M,I.data(),N,zero,ro[i].data(),N);
 
          }
 
@@ -115,15 +115,36 @@ namespace compress {
 
       LO[site].clear();
 
-      if(site == 0)
-         Contract(one,ket[0],shape(0,1),bra[0],shape(0,1),zero,LO[0]);
+      if(site == 0){
+
+         int M = ket[0].shape(2);
+         int N = bra[0].shape(2);
+         int K = bra[0].shape(0) * bra[0].shape(1);
+
+         LO[0].resize(shape(M,N));
+
+         blas::gemm(CblasRowMajor,CblasConjTrans,CblasNoTrans, M, N, K, one, ket[0].data(),M,bra[0].data(),N,zero,LO[0].data(),N);
+
+      }
       else{
 
          TArray<complex<double>,3> I;
 
-         Contract(one,ket[site],shape(0),LO[site - 1],shape(0),zero,I);
+         int M = LO[site-1].shape(0);
+         int N = bra[site].shape(1) * bra[site].shape(2);
+         int K = LO[site-1].shape(1);
 
-         Contract(one,I,shape(2,0),bra[site],shape(0,1),zero,LO[site]);
+         I.resize(shape(M,bra[site].shape(1),bra[site].shape(2)));
+
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, LO[site-1].data(),K,bra[site].data(),N,zero,I.data(),N);
+
+         M = ket[site].shape(2);
+         N = bra[site].shape(2);
+         K = ket[site].shape(0) * ket[site].shape(1);
+
+         LO[site].resize(shape(M,N));
+
+         blas::gemm(CblasRowMajor,CblasConjTrans,CblasNoTrans, M, N, K, one, ket[site].data(),M,I.data(),N,zero,LO[site].data(),N);
 
       }
 
