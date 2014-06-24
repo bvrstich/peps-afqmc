@@ -38,8 +38,8 @@ int main(int argc,char *argv[]){
    mps_a.fill_Random();
    mps_a.normalize();
 
-   MPS mps_b(mps_a);
-   mps_b.compress(4,mps_a,1);
+   MPS mps_b;
+   mps_b.compress(2,mps_a,1);
    cout << mps_b.dotc(mps_a) << endl;
 
    /*
