@@ -166,15 +166,36 @@ namespace compress {
 
       int L = bra.size();
 
-      if(site == L - 1)
-         Contract(one,ket[L - 1],shape(1,2),bra[L - 1],shape(1,2),zero,RO[L - 2]);
+      if(site == L - 1){
+
+         int M = ket[L-1].shape(0);
+         int N = bra[L-1].shape(0);
+         int K = ket[L-1].shape(1) * ket[L-1].shape(2);
+
+         RO[L-2].resize(shape(M,N));
+
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasConjTrans, M, N, K, one, ket[L-1].data(),K,bra[L-1].data(),K,zero,RO[L-2].data(),N);
+
+      }
       else{
 
          TArray<complex<double>,3> I;
 
-         Contract(one,ket[site],shape(2),RO[site],shape(0),zero,I);
+         int M = ket[site].shape(0) * ket[site].shape(1);
+         int N = RO[site].shape(1);
+         int K = ket[site].shape(0);
 
-         Contract(one,I,shape(1,2),bra[site],shape(1,2),zero,RO[site-1]);
+         I.resize(shape(ket[site].shape(0),ket[site].shape(1),N));
+
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, ket[site].data(),K,RO[site].data(),N,zero,I.data(),N);
+
+         M = ket[site].shape(0) ;
+         N = bra[site].shape(0);
+         K = bra[site].shape(1)*bra[site].shape(2);
+
+         RO[site-1].resize(shape(M,N));
+
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasConjTrans, M, N, K, one, I.data(),K,bra[site].data(),K,zero,RO[site-1].data(),N);
 
       }
 
