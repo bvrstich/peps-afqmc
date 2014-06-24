@@ -98,19 +98,20 @@ void Environment::calc_env(char option,const PEPS< complex<double> > &peps,const
          //apply to form MPS with bond dimension D^2
          tmp.gemv('L','H',r,U);
 
+         cout << tmp.dotc(tmp) << endl;
+
          //reduce the dimensions of the edge states using thin svd
          tmp.cut_edges();
 
-         cout << tmp.dot(tmp) << endl;
+         cout << tmp.dotc(tmp) << endl;
 
          //compress in sweeping fashion
          b[r].compress(D_aux,tmp,1);
 
-         cout << tmp.dot(b[r]) << endl;
+         cout << tmp.dotc(b[r]) << endl;
 
-/*
       //}
-
+/*
       //then construct top layer
       t[Ly - 2].fill('t',U);
 
@@ -182,13 +183,13 @@ void Environment::test_env(){
    cout << "FROM BOTTOM TO TOP" << endl;
    cout << endl;
    for(int i = 0;i < Ly - 1;++i)
-      cout << i << "\t" << b[i].dot(t[i]) << endl;
+      cout << i << "\t" << b[i].dotc(t[i]) << endl;
 
    cout << endl;
    cout << "FROM LEFT TO RIGHT" << endl;
    cout << endl;
    for(int i = 0;i < Lx - 1;++i)
-      cout << i << "\t" << r[i].dot(l[i]) << endl;
+      cout << i << "\t" << r[i].dotc(l[i]) << endl;
    cout << endl;
 
 }

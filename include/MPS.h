@@ -34,6 +34,10 @@ class MPS : public vector< TArray<complex<double>,3> > {
 
       int gD() const;
 
+      void fill_Random();
+
+      void normalize();
+
       void fill(char,const SL_PEPS &);
 
       void gemv(char,char ,int, const SL_PEPS &);
@@ -46,9 +50,9 @@ class MPS : public vector< TArray<complex<double>,3> > {
 
       void compress(int ,const MPS &mps,int);
 
-      complex<double> dot(const MPS &bra) const;
+      complex<double> dotc(const MPS &bra) const;
 
-      complex<double> normalize();
+      complex<double> dotu(const MPS &bra) const;
 
    private:
 

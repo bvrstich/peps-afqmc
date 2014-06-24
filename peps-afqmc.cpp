@@ -27,12 +27,22 @@ int main(int argc,char *argv[]){
    int D = atoi(argv[3]);
    int D_aux = atoi(argv[4]);
 
+
    //initialize the dimensions of the problem
    global::init(d,L,L);
 
    //and some static objects
    Environment::init(D,D_aux);
 
+   MPS mps_a(4);
+   mps_a.fill_Random();
+   mps_a.normalize();
+
+   MPS mps_b(mps_a);
+   mps_b.compress(4,mps_a,1);
+   cout << mps_b.dotc(mps_a) << endl;
+
+   /*
    //set trotter terms on Heisenberg model
    double dtau = 0.01;
 
@@ -49,17 +59,17 @@ int main(int argc,char *argv[]){
 
    //set the values
    Propagator P;
-/*
+
    //now loop over the auxiliary fields:
    for(int k = 0;k < Trotter::n_trot;++k)
       for(int r = 0;r < 3;++r){
-*/
+
          double x = 0.5;//RN.normal();
 
          complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
 
          //set the values
-         P.set(x + shift,0,0);
+         P.set(x + shift,1,1);
 
          //and fill the propagator
          P.fill();
@@ -74,7 +84,7 @@ int main(int argc,char *argv[]){
    Environment::U.fill('H',peps,walker);
 
    Environment::calc_env('H',peps,walker);
-   /*
+
    Environment::test_env();
 
    walker.calc_properties('H',peps);

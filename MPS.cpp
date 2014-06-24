@@ -53,6 +53,16 @@ MPS::MPS(const MPS &mps_copy) : vector< TArray<complex<double>,3> >(mps_copy) {
 MPS::~MPS(){ }
 
 /**
+ * fill with random entries
+ */
+void MPS::fill_Random(){
+
+   for(int i = 0;i < this->size();++i)
+      (*this)[i].generate(rgen< complex<double> >);
+
+}
+
+/**
  * fill a MPS object, by creating a single layer from contracting a peps with a physical vector
  * @param row index of row
  * @param slp single layer contracted peps
@@ -480,31 +490,23 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
    std::vector< TArray<complex<double>,2> > LO(L - 1);
 
    compress::init_ro(Right,RO,mps,*this);
-   compress::init_ro(Left,LO,mps,*this);
-
-   cout << endl;
-   for(int i = 0;i < L-1;++i){
-
-      complex<double> ward(0.0);
-
-      for(int j = 0;j < RO[i].shape(0);++j)
-         for(int k = 0;k < RO[i].shape(1);++k)
-            ward += RO[i](j,k) * LO[i](k,j);
-
-      cout << ward << endl;
-
-   }
-   cout << endl;
 
    int iter = 0;
 
 //   while(iter < n_iter){
 
       //first site
-      (*this)[0].clear();
-
       Contract(one,mps[0],shape(2),RO[0],shape(1),zero,(*this)[0]);
 /*
+      int M = bra[0].shape(2);
+      int N = ket[0].shape(2);
+      int K = ket[0].shape(0) * ket[0].shape(1);
+
+      ro[0].resize(shape(M,N));
+
+      blas::gemm(CblasRowMajor,CblasConjTrans,CblasNoTrans, M, N, K, one, bra[0].data(),M,ket[0].data(),N,zero,ro[0].data(),N);
+
+
       //QR
       Geqrf((*this)[0],RO[0]);
 
@@ -519,24 +521,24 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
       for(int i = 1;i < L - 1;++i){
 
-         TArray<complex<double>,3> I;
+      TArray<complex<double>,3> I;
 
-         Contract(one,mps[i],shape(2),RO[i],shape(1),zero,I);
+      Contract(one,mps[i],shape(2),RO[i],shape(1),zero,I);
 
-         (*this)[i].clear();
+      (*this)[i].clear();
 
-         Contract(one,LO[i - 1],shape(1),I,shape(0),zero,(*this)[i]);
+      Contract(one,LO[i - 1],shape(1),I,shape(0),zero,(*this)[i]);
 
-         Geqrf((*this)[i],RO[i]);
+      Geqrf((*this)[i],RO[i]);
 
-         //paste to next matrix
-         tmp.clear();
+      //paste to next matrix
+      tmp.clear();
 
-         Contract(one,RO[i],shape(1),(*this)[i + 1],shape(0),zero,tmp);
+      Contract(one,RO[i],shape(1),(*this)[i + 1],shape(0),zero,tmp);
 
-         (*this)[i + 1] = std::move(tmp);
+      (*this)[i + 1] = std::move(tmp);
 
-         compress::update_L(i,LO,mps,*this);
+      compress::update_L(i,LO,mps,*this);
 
       }
 
@@ -559,32 +561,32 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
       for(int i = L - 2;i > 0;--i){
 
-         TArray<complex<double>,3> I;
+      TArray<complex<double>,3> I;
 
-         Contract(one,mps[i],shape(2),RO[i],shape(1),zero,I);
+      Contract(one,mps[i],shape(2),RO[i],shape(1),zero,I);
 
-         (*this)[i].clear();
+      (*this)[i].clear();
 
-         Contract(one,LO[i - 1],shape(1),I,shape(0),zero,(*this)[i]);
+      Contract(one,LO[i - 1],shape(1),I,shape(0),zero,(*this)[i]);
 
-         Gelqf(LO[i],(*this)[i]);
+      Gelqf(LO[i],(*this)[i]);
 
-         //paste to previous matrix
-         tmp.clear();
+      //paste to previous matrix
+      tmp.clear();
 
-         Contract(one,(*this)[i - 1],shape(2),LO[i],shape(0),zero,tmp);
+      Contract(one,(*this)[i - 1],shape(2),LO[i],shape(0),zero,tmp);
 
-         (*this)[i - 1] = std::move(tmp);
+      (*this)[i - 1] = std::move(tmp);
 
-         compress::update_R(i,RO,mps,*this);
+      compress::update_R(i,RO,mps,*this);
 
-      }
+}
 
-      ++iter;
+++iter;
 
- //  }
+//  }
 */
-   this->D = Dc;
+this->D = Dc;
 
 }
 
@@ -592,7 +594,7 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
  * @param bra the bra of the inner product
  * @return the inner product of two MPS's, with *this being the ket
  */
-complex<double> MPS::dot(const MPS &bra) const {
+complex<double> MPS::dotu(const MPS &bra) const {
 
    complex<double> one(1.0,0.0);
    complex<double> zero(0.0,0.0);
@@ -612,6 +614,53 @@ complex<double> MPS::dot(const MPS &bra) const {
       E.clear();
 
       Contract(one,I,shape(2,0),(*this)[i],shape(0,1),zero,E);
+
+   }
+
+   return E(0,0);
+
+}
+/**
+ * take the inner product with complex conjugation of the bra
+ * @param bra the bra of the inner product:
+ * @return the inner product of two MPS's, with *this being the ket
+ */
+complex<double> MPS::dotc(const MPS &bra) const {
+
+   int L = this->size();
+
+   complex<double> one(1.0,0.0);
+   complex<double> zero(0.0,0.0);
+
+   int M = bra[0].shape(2);
+   int N = (*this)[0].shape(2);
+   int K = (*this)[0].shape(0) * (*this)[0].shape(1);
+
+   TArray<complex<double>,2> E;
+
+   E.resize(shape(M,N));
+
+   blas::gemm(CblasRowMajor,CblasConjTrans,CblasNoTrans, M, N, K, one, bra[0].data(),M,(*this)[0].data(),N,zero,E.data(),N);
+
+   TArray<complex<double>,3> I;
+
+   for(int i = 1;i < L;++i){
+
+      M = E.shape(0);
+      N = (*this)[i].shape(1) * (*this)[i].shape(2);
+      K = E.shape(1);
+
+      I.resize(shape(M,(*this)[i].shape(1),(*this)[i].shape(2)));
+
+      blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, E.data(),K,(*this)[i].data(),N,zero,I.data(),N);
+
+      M = bra[i].shape(2);
+      N = (*this)[i].shape(2);
+      K = bra[i].shape(0) * bra[i].shape(1);
+
+      E.resize(shape(M,N));
+
+      blas::gemm(CblasRowMajor,CblasConjTrans,CblasNoTrans, M, N, K, one, bra[i].data(),M,I.data(),N,zero,E.data(),N);
 
    }
 
@@ -686,5 +735,20 @@ void MPS::cut_edges() {
       --i;
 
    }
+
+}
+
+
+/**
+ * normalize the MPS
+ */
+void MPS::normalize(){
+
+   complex<double> nrm2 = this->dotc(*this);
+
+   nrm2 = pow(nrm2,(complex<double>)1.0/(complex<double>)(2.0*this->size()));
+
+   for(int i = 0;i < this->size();++i)
+      Scal(1.0/nrm2,(*this)[i]);
 
 }
