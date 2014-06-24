@@ -485,15 +485,21 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
    //initial guess by performing svd compression of uncanonicalized state: output is right-canonicalized state
    guess(Right,Dc,mps);
 
+   cout << this->dotc(mps) << endl;
+
    //construct renormalized operators
    std::vector< TArray<complex<double>,2> > RO(L - 1);
    std::vector< TArray<complex<double>,2> > LO(L - 1);
 
    compress::init_ro(Right,RO,mps,*this);
+   compress::init_ro(Left,LO,mps,*this);
 
+   for(int i = 0;i < this->size() - 1;++i)
+      cout << i << "\t" << Dotc(LO[i],RO[i]) << endl;
+/*
    int iter = 0;
 
-   while(iter < n_iter){
+   //while(iter < n_iter){
 
       //first site
       int M = mps[0].shape(1);
@@ -615,10 +621,10 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
       ++iter;
 
-       }
+      // }
      
+*/
          this->D = Dc;
-
 }
 
 /**

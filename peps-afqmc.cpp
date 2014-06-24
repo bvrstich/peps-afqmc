@@ -60,7 +60,7 @@ int main(int argc,char *argv[]){
          complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
 
          //set the values
-         P.set(x + shift,1,1);
+         P.set(x + shift,0,1);
 
          //and fill the propagator
          P.fill();
@@ -74,8 +74,12 @@ int main(int argc,char *argv[]){
 
    Environment::U.fill('H',peps,walker);
    Environment::calc_env('H',peps,walker);
+/*
+   Environment::U.fill('V',peps,walker);
+   Environment::calc_env('V',peps,walker);
 
    Environment::test_env();
+*/
 /*
    walker.calc_properties('H',peps);
 
