@@ -34,15 +34,6 @@ int main(int argc,char *argv[]){
    //and some static objects
    Environment::init(D,D_aux);
 
-   MPS mps_a(4);
-   mps_a.fill_Random();
-   mps_a.normalize();
-
-   MPS mps_b;
-   mps_b.compress(2,mps_a,1);
-   cout << mps_b.dotc(mps_a) << endl;
-
-   /*
    //set trotter terms on Heisenberg model
    double dtau = 0.01;
 
@@ -61,8 +52,8 @@ int main(int argc,char *argv[]){
    Propagator P;
 
    //now loop over the auxiliary fields:
-   for(int k = 0;k < Trotter::n_trot;++k)
-      for(int r = 0;r < 3;++r){
+ //  for(int k = 0;k < Trotter::n_trot;++k)
+ //     for(int r = 0;r < 3;++r){
 
          double x = 0.5;//RN.normal();
 
@@ -82,11 +73,10 @@ int main(int argc,char *argv[]){
    walker.normalize();
 
    Environment::U.fill('H',peps,walker);
-
    Environment::calc_env('H',peps,walker);
 
    Environment::test_env();
-
+/*
    walker.calc_properties('H',peps);
 
    cout << walker.gEL() << endl;
