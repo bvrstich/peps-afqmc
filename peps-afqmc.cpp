@@ -47,7 +47,7 @@ int main(int argc,char *argv[]){
    peps.load(filename);
 
    Walker walker;
-
+/*
    //set the values
    Propagator P;
 
@@ -60,7 +60,7 @@ int main(int argc,char *argv[]){
          complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
 
          //set the values
-         P.set(x + shift,0,1);
+         P.set(x + shift,0,0);
 
          //and fill the propagator
          P.fill();
@@ -71,7 +71,7 @@ int main(int argc,char *argv[]){
       //}
 
    walker.normalize();
-
+*/
    Environment::U.fill('H',peps,walker);
    Environment::calc_env('H',peps,walker);
 /*

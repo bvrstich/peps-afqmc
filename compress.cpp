@@ -81,7 +81,7 @@ namespace compress {
 
             M = ket[i].shape(0) * ket[i].shape(1);
             N = ro[i].shape(1);
-            K = ket[i].shape(0);
+            K = ket[i].shape(2);
 
             I.resize(shape(ket[i].shape(0),ket[i].shape(1),N));
 

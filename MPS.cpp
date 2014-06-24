@@ -492,14 +492,10 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
    std::vector< TArray<complex<double>,2> > LO(L - 1);
 
    compress::init_ro(Right,RO,mps,*this);
-   compress::init_ro(Left,LO,mps,*this);
 
-   for(int i = 0;i < this->size() - 1;++i)
-      cout << i << "\t" << Dotc(LO[i],RO[i]) << endl;
-/*
    int iter = 0;
 
-   //while(iter < n_iter){
+//   while(iter < n_iter){
 
       //first site
       int M = mps[0].shape(1);
@@ -507,7 +503,7 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
       int K = mps[0].shape(2);
 
       blas::gemm(CblasRowMajor,CblasNoTrans,CblasConjTrans, M, N, K, one, mps[0].data(),K,RO[0].data(),K,zero,(*this)[0].data(),N);
-
+/*
       //QR
       Geqrf((*this)[0],RO[0]);
 
@@ -621,10 +617,10 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
       ++iter;
 
-      // }
-     
+   }
 */
-         this->D = Dc;
+   this->D = Dc;
+
 }
 
 /**
