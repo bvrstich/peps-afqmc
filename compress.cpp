@@ -116,7 +116,7 @@ namespace compress {
       LO[site].clear();
 
       if(site == 0){
-
+         
          int M = ket[0].shape(2);
          int N = bra[0].shape(2);
          int K = bra[0].shape(0) * bra[0].shape(1);

@@ -522,42 +522,41 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
       compress::update_L(0,LO,mps,*this);
 
-//      for(int i = 1;i < L - 1;++i){
-      int i = 1;
+      for(int i = 1;i < L - 1;++i){
 
-      M = mps[i].shape(0) * mps[i].shape(1);
-      N = RO[i].shape(0);
-      K = RO[i].shape(1);
+         M = mps[i].shape(0) * mps[i].shape(1);
+         N = RO[i].shape(0);
+         K = RO[i].shape(1);
 
-      tmp.resize(shape(mps[i].shape(0),mps[i].shape(1),N));
+         tmp.resize(shape(mps[i].shape(0),mps[i].shape(1),N));
 
-      blas::gemm(CblasRowMajor,CblasNoTrans,CblasConjTrans, M, N, K, one, mps[i].data(),K,RO[i].data(),K,zero,tmp.data(),N);
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasConjTrans, M, N, K, one, mps[i].data(),K,RO[i].data(),K,zero,tmp.data(),N);
 
-      M = LO[i-1].shape(0);
-      N = tmp.shape(1)*tmp.shape(2);
-      K = tmp.shape(0);
+         M = LO[i-1].shape(0);
+         N = tmp.shape(1)*tmp.shape(2);
+         K = tmp.shape(0);
 
-      (*this)[i].resize(shape(LO[i-1].shape(0),mps[i].shape(1),RO[i].shape(0)));
+         (*this)[i].resize(shape(LO[i-1].shape(0),mps[i].shape(1),RO[i].shape(0)));
 
-      blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, LO[i-1].data(),K,tmp.data(),N,zero,(*this)[i].data(),N);
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, LO[i-1].data(),K,tmp.data(),N,zero,(*this)[i].data(),N);
 
-      Geqrf((*this)[i],RO[i]);
+         Geqrf((*this)[i],RO[i]);
 
-      //paste to next matrix
-      M = RO[i].shape(0);
-      N = (*this)[i+1].shape(1) * (*this)[i+1].shape(2);
-      K = RO[i].shape(1);
+         //paste to next matrix
+         M = RO[i].shape(0);
+         N = (*this)[i+1].shape(1) * (*this)[i+1].shape(2);
+         K = RO[i].shape(1);
 
-      tmp.resize(shape(M,(*this)[1].shape(1),(*this)[1].shape(2)));
+         tmp.resize(shape(M,(*this)[i+1].shape(1),(*this)[i+1].shape(2)));
 
-      blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, RO[i].data(),K,(*this)[i+1].data(),N,zero,tmp.data(),N);
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, RO[i].data(),K,(*this)[i+1].data(),N,zero,tmp.data(),N);
 
-      (*this)[i+1] = std::move(tmp);
+         (*this)[i+1] = std::move(tmp);
 
-      compress::update_L(i,LO,mps,*this);
+         compress::update_L(i,LO,mps,*this);
 
-      //      }
-/*
+      }
+      /*
       //and backward!
       (*this)[L - 1].clear();
 
