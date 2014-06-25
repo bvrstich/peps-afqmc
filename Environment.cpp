@@ -176,13 +176,13 @@ void Environment::test_env(){
    cout << "FROM BOTTOM TO TOP" << endl;
    cout << endl;
    for(int i = 0;i < Ly - 1;++i)
-      cout << i << "\t" << b[i].dotc(t[i]) << endl;
+      cout << i << "\t" << b[i].dotu(t[i]) << endl;
 
    cout << endl;
    cout << "FROM LEFT TO RIGHT" << endl;
    cout << endl;
    for(int i = 0;i < Lx - 1;++i)
-      cout << i << "\t" << r[i].dotc(l[i]) << endl;
+      cout << i << "\t" << r[i].dotu(l[i]) << endl;
    cout << endl;
 
 }
