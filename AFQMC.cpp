@@ -28,6 +28,8 @@ AFQMC::AFQMC(const PEPS< complex<double> > &peps_in,int Nw_in){
    this->peps = peps_in;
    this->Nw = Nw_in;
 
+   P.resize(omp_num_threads);
+
    SetupWalkers();
 
 }
@@ -44,6 +46,7 @@ void AFQMC::SetupWalkers(){
 
    walker.resize(Nw);
 
+#pragma omp parallel for
    for(int i = 0;i < walker.size();++i)
       walker[i].calc_properties('V',peps);
 
@@ -129,7 +132,7 @@ double AFQMC::propagate(char option){
 
    double sum = 0.0;
 
-#pragma omp parallel for reduction(+: sum,num_rej)
+#pragma omp parallel for reduction(+: sum)
    for(int i = 0;i < walker.size();i++){
 
 #ifdef _OPENMP
@@ -147,13 +150,13 @@ double AFQMC::propagate(char option){
             complex<double> shift = walker[i].gVL(k,r);
 
             //set the values
-            P.set(x + shift,k,r);
+            P[myID].set(x + shift,k,r);
 
             //and fill the propagator
-            P.fill();
+            P[myID].fill();
 
             //and apply it to the walker:
-            walker[i].propagate(P);
+            walker[i].propagate(P[myID]);
 
          }
 

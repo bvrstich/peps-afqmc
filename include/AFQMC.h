@@ -45,7 +45,7 @@ class AFQMC {
       int Nw;
       
       //propagator
-      Propagator P;
+      std::vector< Propagator > P;
       
       //!Trial wfn 
       PEPS< complex<double> > peps;

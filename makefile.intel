@@ -7,19 +7,20 @@
 # -----------------------------------------------------------------------------
 #   Sources for all modules
 # -----------------------------------------------------------------------------
-BINNAME = peps
-CPPSRC	= main.cpp\
+BINNAME = peps-afqmc
+CPPSRC   = peps-afqmc.cpp\
+           global.cpp\
            Random.cpp\
-           Lattice.cpp\
            PEPS.cpp\
-           MPS.cpp\
+           Walker.cpp\
+           SL_PEPS.cpp\
            MPO.cpp\
-           compress.cpp\
-           Global.cpp\
+           MPS.cpp\
            Environment.cpp\
-           Heisenberg.cpp\
+           compress.cpp\
            Trotter.cpp\
-           propagate.cpp\
+           Propagator.cpp\
+           AFQMC.cpp\
            btas_defs.cpp
 
 OBJ	= $(CPPSRC:.cpp=.o)
@@ -34,7 +35,7 @@ BTASLIB= /home/bright/btas/lib
 
 INCLUDE = ./include
 
-LIBS= -lpthread -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core
+LIBS= -lpthread -lmkl_intel_lp64 -lmkl_sequential -lmkl_core
 #LIBS= -lblas -llapacke
 
 CC	= icc

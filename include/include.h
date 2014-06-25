@@ -5,6 +5,8 @@
 
 #include <btas/DENSE/TArray.h>
 
+#include "omp.h"
+
 #include "Random.h"
 #include "global.h"
 

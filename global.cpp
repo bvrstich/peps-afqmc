@@ -21,13 +21,15 @@ namespace global{
 
    TArray<complex<double>,2> Sz;
 
-   std::vector< std::vector< complex<double> > > auxvec;
+   std::vector< std::vector< std::vector< complex<double> > > > auxvec;
 
    std::vector< TArray<complex<double>,2> > Mx;
 
    std::vector< TArray<complex<double>,2> > My;
 
    std::vector< TArray<complex<double>,2> > Mz;
+
+   int omp_num_threads;
 
    int Lx;
    int Ly;
@@ -42,6 +44,12 @@ namespace global{
     * @param Ly_in y dimension of the square lattice
     */
    void init(int d_in,int Lx_in,int Ly_in){
+
+#ifdef _OPENMP
+      omp_num_threads = omp_get_max_threads();
+#else
+      omp_num_threads = 1;
+#endif
 
       Lx = Lx_in;
       Ly = Ly_in;
@@ -72,10 +80,16 @@ namespace global{
       Sz(1,0) = complex<double>(0.0,0.0);
       Sz(1,1) = complex<double>(0.5,0.0);
 
-      auxvec.resize(Lx*Ly);
+      auxvec.resize(omp_num_threads);
 
-      for(int i = 0;i < auxvec.size();++i)//for x,y and z components
-         auxvec[i].resize(3);
+      for(int thr = 0;thr < omp_num_threads;++thr){
+
+         auxvec[thr].resize(Lx*Ly);
+
+         for(int i = 0;i < auxvec[thr].size();++i)//for x,y and z components
+            auxvec[thr][i].resize(3);
+
+      }
 
       //now construct the propagating operators
 

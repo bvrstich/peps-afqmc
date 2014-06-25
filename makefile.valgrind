@@ -7,20 +7,21 @@
 # -----------------------------------------------------------------------------
 #   Sources for all modules
 # -----------------------------------------------------------------------------
-BINNAME = peps
-CPPSRC	= main.cpp\
-           Random.cpp\
-           Lattice.cpp\
-           PEPS.cpp\
-           MPS.cpp\
-           MPO.cpp\
-           compress.cpp\
-           Global.cpp\
-           Environment.cpp\
-           Heisenberg.cpp\
-           Trotter.cpp\
-           propagate.cpp\
-           btas_defs.cpp
+BINNAME = peps-afqmc
+CPPSRC	= peps-afqmc.cpp\
+            global.cpp\
+            Random.cpp\
+            PEPS.cpp\
+            Walker.cpp\
+            SL_PEPS.cpp\
+            MPO.cpp\
+            MPS.cpp\
+            Environment.cpp\
+            compress.cpp\
+            Trotter.cpp\
+            Propagator.cpp\
+            AFQMC.cpp\
+            btas_defs.cpp
 
 OBJ	= $(CPPSRC:.cpp=.o)
 
@@ -43,7 +44,7 @@ CXX	= g++
 # -----------------------------------------------------------------------------
 #   Compiler & Linker flags
 # -----------------------------------------------------------------------------
-CFLAGS	= -I$(INCLUDE) -g -std=c++11 -D_HAS_CBLAS -D_HAS_LAPACKE
+CFLAGS	= -I$(INCLUDE) -g -std=c++11 -D_HAS_CBLAS -D_HAS_LAPACKE -D_DEBUG
 LDFLAGS	= -g
 
 # =============================================================================

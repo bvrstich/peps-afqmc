@@ -26,18 +26,18 @@ class Environment {
       static void test_env();
 
       //!stores an array environment MPS's for l(eft) , r(ight), t(op) and b(ottom)
-      static vector< MPS > l;
-      static vector< MPS > r;
-      static vector< MPS > t;
-      static vector< MPS > b;
+      static vector< vector< MPS > > l;
+      static vector< vector< MPS > > r;
+      static vector< vector< MPS > > t;
+      static vector< vector< MPS > > b;
 
       //!overlap between walker and trial PEPS
-      static SL_PEPS U;
+      static vector< SL_PEPS > U;
 
       //!expectation between walker and trial, with operator O=Sn
-      static SL_PEPS Sx;
-      static SL_PEPS Sy;
-      static SL_PEPS Sz;
+      static vector< SL_PEPS > Sx;
+      static vector< SL_PEPS > Sy;
+      static vector< SL_PEPS > Sz;
 
       //!auxiliary bond dimension for the environment contractions
       static int D_aux;

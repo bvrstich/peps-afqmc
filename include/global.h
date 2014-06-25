@@ -34,8 +34,11 @@ namespace global {
    //!Sz matrix
    extern TArray<complex<double>,2> Sz;
 
+   //!number of threads in the program: for openmp
+   extern int omp_num_threads;
+
    //!intermediate storage for calculation of auxiliary operator expectation values
-   extern vector< vector< complex<double> > > auxvec;
+   extern vector< vector< vector< complex<double> > > > auxvec;
 
    void init(int,int,int);
 

@@ -27,7 +27,6 @@ int main(int argc,char *argv[]){
    int D = atoi(argv[3]);
    int D_aux = atoi(argv[4]);
 
-
    //initialize the dimensions of the problem
    global::init(d,L,L);
 
@@ -46,7 +45,7 @@ int main(int argc,char *argv[]){
    PEPS< complex<double> > peps;
    peps.load(filename);
 
-   int Nw = 128;
+   int Nw = 1024;
 
    AFQMC afqmc(peps,Nw);
    afqmc.walk(1);
