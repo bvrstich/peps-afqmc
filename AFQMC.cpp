@@ -23,9 +23,8 @@ using namespace global;
  * @param peps_in input trialwavefunction
  * @param Nwalkers number of Walker states
  */
-AFQMC::AFQMC(const PEPS< complex<double> > &peps_in,int Nw_in){
+AFQMC::AFQMC(int Nw_in){
 
-   this->peps = peps_in;
    this->Nw = Nw_in;
 
    P.resize(omp_num_threads);
@@ -57,7 +56,7 @@ void AFQMC::walk(const int steps){
    complex<double> EP = gEP();
 
    char filename[200];
-   sprintf(filename,"output/%dx%d/D=%d.txt",Lx,Ly,peps.gD());
+   sprintf(filename,"output/%dx%d/D=%d.txt",Lx,Ly,DT);
 
    ofstream output(filename,ios::trunc);
 
@@ -297,7 +296,7 @@ complex<double> AFQMC::gEP(){
 void AFQMC::write(const int step,const double EP, const double ET){
 
    char filename[200];
-   sprintf(filename,"output/%dx%d/D=%d.txt",Lx,Ly,peps.gD());
+   sprintf(filename,"output/%dx%d/D=%d.txt",Lx,Ly,DT);
 
    ofstream output(filename,ios::app);
    output.precision(16);

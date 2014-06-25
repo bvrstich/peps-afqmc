@@ -12,6 +12,8 @@ using std::complex;
 
 using namespace btas;
 
+#include "PEPS.h"
+
 namespace global {
 
    extern Random RN;
@@ -24,6 +26,9 @@ namespace global {
 
    //!physical dimension of sites
    extern int d;
+
+   //!virtual dimension of the trial
+   extern int DT;
 
    //!Sx matrix
    extern TArray<complex<double>,2> Sx;
@@ -40,7 +45,9 @@ namespace global {
    //!intermediate storage for calculation of auxiliary operator expectation values
    extern vector< vector< vector< complex<double> > > > auxvec;
 
-   void init(int,int,int);
+   extern PEPS< complex<double> > peps;
+
+   void init(int,int,int,int);
 
    template<typename T>
       T rgen();

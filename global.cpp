@@ -29,6 +29,10 @@ namespace global{
 
    std::vector< TArray<complex<double>,2> > Mz;
 
+   PEPS< complex<double> > peps;
+
+   int DT;
+
    int omp_num_threads;
 
    int Lx;
@@ -39,11 +43,12 @@ namespace global{
    Random RN;
 
    /**
+    * @param DT_in virtual dimension of the trial
     * @param d_in physical dimension
     * @param Lx_in x dimension of the square lattice
     * @param Ly_in y dimension of the square lattice
     */
-   void init(int d_in,int Lx_in,int Ly_in){
+   void init(int DT_in,int d_in,int Lx_in,int Ly_in){
 
 #ifdef _OPENMP
       omp_num_threads = omp_get_max_threads();
@@ -55,6 +60,8 @@ namespace global{
       Ly = Ly_in;
 
       d = d_in;
+
+      DT = DT_in;
 
       //Sx
       Sx.resize(d,d);
@@ -138,6 +145,14 @@ namespace global{
          Mz[i](i,i) = 1.0;
 
       }
+
+      //read in the trial state
+      char filename[200];
+      sprintf(filename,"/home/bright/bestanden/results/peps/output/%dx%d/D=%d",Lx,Ly,DT);
+
+      peps.resize(Lx*Ly);
+      peps.load(filename);
+      peps.sD(DT_in);
 
    }
 

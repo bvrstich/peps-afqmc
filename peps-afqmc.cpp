@@ -27,8 +27,8 @@ int main(int argc,char *argv[]){
    int D = atoi(argv[3]);
    int D_aux = atoi(argv[4]);
 
-   //initialize the dimensions of the problem
-   global::init(d,L,L);
+   //initialize the dimensions of the problem, set the trial
+   global::init(D,d,L,L);
 
    //and some static objects
    Environment::init(D,D_aux);
@@ -38,17 +38,10 @@ int main(int argc,char *argv[]){
 
    Trotter::heisenberg(dtau);
 
-   //read in the trial state
-   char filename[200];
-   sprintf(filename,"input/%dx%d/D=%d",L,L,D);
+   int Nw = 512;
 
-   PEPS< complex<double> > peps;
-   peps.load(filename);
-
-   int Nw = 1024;
-
-   AFQMC afqmc(peps,Nw);
-   afqmc.walk(1);
+   AFQMC afqmc(Nw);
+   afqmc.walk(1000000);
  
    return 0;
 

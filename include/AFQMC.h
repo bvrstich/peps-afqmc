@@ -16,7 +16,7 @@ class AFQMC {
    public:
    
       //constructor with input trialwavefunction
-      AFQMC(const PEPS< complex<double> > &,int);
+      AFQMC(int);
       
       //Destructor
       virtual ~AFQMC();
@@ -46,9 +46,6 @@ class AFQMC {
       
       //propagator
       std::vector< Propagator > P;
-      
-      //!Trial wfn 
-      PEPS< complex<double> > peps;
       
       //!The walkers
       std::vector<Walker> walker;

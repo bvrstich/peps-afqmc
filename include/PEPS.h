@@ -49,26 +49,6 @@ class PEPS : public vector< TArray<T,5> > {
 
 };
 
-/**
- * output stream operator overloaded for PEPS<T> 
- */
-template<typename T>
-ostream &operator<<(ostream &output,const PEPS<T> &peps_p){
-
-   for(int r = 0;r < global::Ly;++r)
-      for(int c = 0;c < global::Lx;++c){
-
-         output << std::endl;
-         output << "Tensor on site (" << r << "," << c << ")\t" << std::endl;
-         output << std::endl;
-         output << peps_p(r,c) << std::endl;
-
-      }
-
-   return output;
-
-}
-
 #endif
 
 /* vim: set ts=3 sw=3 expandtab :*/
