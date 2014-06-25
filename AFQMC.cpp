@@ -62,11 +62,11 @@ void AFQMC::walk(const int steps){
    output.close();
 
 #ifdef _DEBUG
-   cout << "Energy at start = " << 2.0 * EP << endl;
+   cout << "Energy at start = " << EP << endl;
    cout << "---------------------------------------------------------" << endl;
 #endif
 
-   for(int step = 1;step <= steps;step++){
+   for(int step = 0;step < steps;step++){
 
       //Propagate the walkers of each rank separately
       double wsum;
@@ -95,7 +95,7 @@ void AFQMC::walk(const int steps){
 #endif
 
       write(step,std::real(EP), ET);
-/*
+
       //Based on scaling, first control the population on each rank separately, and then balance the population over the ranks (uses MPI)
       PopulationControl(scaling);
 
@@ -104,11 +104,11 @@ void AFQMC::walk(const int steps){
 
       for(int i = 0;i < walker.size();++i){
 
-         if(min_en > std::real(walker[i]->gEL()))
-            min_en = std::real(walker[i]->gEL());
+         if(min_en > std::real(walker[i].gEL()))
+            min_en = std::real(walker[i].gEL());
 
-         if(min_ov > std::abs(walker[i]->gOverlap()))
-            min_ov = std::abs(walker[i]->gOverlap());
+         if(min_ov > std::abs(walker[i].gOverlap()))
+            min_ov = std::abs(walker[i].gOverlap());
 
       }
 
@@ -116,7 +116,7 @@ void AFQMC::walk(const int steps){
       cout << "Minimal Energy:\t" << min_en << endl;
       cout << "Minimal Overlap:\t" << min_ov << endl;
 #endif
- */
+
    }
 
 }
@@ -144,7 +144,7 @@ double AFQMC::propagate(char option){
 
             double x = RN.normal();
 
-            complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
+            complex<double> shift = walker[i].gVL(k,r);
 
             //set the values
             P.set(x + shift,k,r);
@@ -189,8 +189,7 @@ double AFQMC::propagate(char option){
 /**
  * redistribute the weights to stabilize the walk, keep the population in check
  */
-/*
-   void AFQMC::PopulationControl(double scaling){
+void AFQMC::PopulationControl(double scaling){
 
    double minw = 1.0;
    double maxw = 1.0;
@@ -199,72 +198,70 @@ double AFQMC::propagate(char option){
 
    for(int i = 0;i < walker.size();i++){
 
-   walker[i]->multWeight(scaling);
+      walker[i].multWeight(scaling);
 
-   double weight = walker[i]->gWeight();
+      double weight = walker[i].gWeight();
 
-   if(weight < minw)
-   minw = weight;
+      if(weight < minw)
+         minw = weight;
 
-   if(weight > maxw)
-   maxw = weight;
+      if(weight > maxw)
+         maxw = weight;
 
-   if (weight < 0.25){ //Energy doesn't change statistically
+      if (weight < 0.25){ //Energy doesn't change statistically
 
-   int nCopies = (int) ( weight + Global::RN());
+         int nCopies = (int) ( weight + rgen<double>());
 
-   if(nCopies == 0){
-
-#ifdef _DEBUG
-cout << "Walker with weight " << weight << " will be deleted." << endl;
-#endif
-
-delete walker[i];
-
-walker.erase(walker.begin() + i);
-
-}
-else
-walker[i]->sWeight(1.0);
-
-}
-
-if(weight > 1.5){ //statically energy doesn't change
-
-int nCopies =(int) ( weight + Global::RN());
-double new_weight = weight / (double) nCopies;
-
-walker[i]->sWeight(new_weight);
+         if(nCopies == 0){
 
 #ifdef _DEBUG
-cout << "Walker with weight " << weight << " will be " << nCopies << " times copied with weight " << new_weight << "." << endl;
+            cout << "Walker with weight " << weight << " will be deleted." << endl;
 #endif
 
-for(int n = 1;n < nCopies;++n){
+            walker.erase(walker.begin() + i);
 
-Walker *nw = new Walker(*walker[i]);
+         }
+         else
+            walker[i].sWeight(1.0);
 
-walker.push_back(nw);
+      }
 
-}
+      if(weight > 1.5){ //statically energy doesn't change
 
-}
+         int nCopies =(int) ( weight + rgen<double>());
+         double new_weight = weight / (double) nCopies;
 
-sum += weight;
-
-}
+         walker[i].sWeight(new_weight);
 
 #ifdef _DEBUG
-cout << endl;
-cout << "total weight:\t" << sum << endl;
-cout << endl;
+         cout << "Walker with weight " << weight << " will be " << nCopies << " times copied with weight " << new_weight << "." << endl;
+#endif
 
-cout << "The min. encountered weight is " << minw << " ." << endl;
-cout << "The max. encountered weight is " << maxw << " ." << endl;
+         for(int n = 1;n < nCopies;++n){
+
+            Walker nw = walker[i];
+
+            walker.push_back(nw);
+
+         }
+
+      }
+
+      sum += weight;
+
+   }
+
+#ifdef _DEBUG
+   cout << endl;
+   cout << "total weight:\t" << sum << endl;
+   cout << endl;
+
+   cout << "The min. encountered weight is " << minw << " ." << endl;
+   cout << "The max. encountered weight is " << maxw << " ." << endl;
 #endif
 
 }
-*/
+
 /**
  * @return the total projected energy of the walkers at a certain timestep
  */
@@ -285,7 +282,7 @@ complex<double> AFQMC::gEP(){
 
    complex<double> EP = 0.0;
 
-   EP = projE_num / projE_den;
+   EP = 2.0 * projE_num / projE_den;
 
    return EP;
 

@@ -35,7 +35,7 @@ int main(int argc,char *argv[]){
    Environment::init(D,D_aux);
 
    //set trotter terms on Heisenberg model
-   double dtau = 0.01;
+   double dtau = 0.001;
 
    Trotter::heisenberg(dtau);
 
@@ -46,51 +46,11 @@ int main(int argc,char *argv[]){
    PEPS< complex<double> > peps;
    peps.load(filename);
 
-   Walker walker;
+   int Nw = 128;
 
-   //set the values
-   Propagator P;
-
-   //now loop over the auxiliary fields:
-   for(int k = 0;k < Trotter::n_trot;++k)
-      for(int r = 0;r < 3;++r){
-
-         double x = 0.5;//RN.normal();
-
-         complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
-
-         //set the values
-         P.set(x + shift,k,r);
-
-         //and fill the propagator
-         P.fill();
-
-         //and apply it to the walker:
-         walker.propagate(P);
-
-      }
-
-   walker.normalize();
-
-   Environment::U.fill('H',peps,walker);
-   Environment::calc_env('H',peps,walker);
-
-   Environment::U.fill('V',peps,walker);
-   Environment::calc_env('V',peps,walker);
-
-   Environment::test_env();
-
-/*
-   walker.calc_properties('H',peps);
-
-   cout << walker.gEL() << endl;
-   cout << walker.gOverlap() << endl;
-
-      int Nw = 1;
-
-      AFQMC afqmc(peps,Nw);
-      afqmc.walk(1);
-    */
+   AFQMC afqmc(peps,Nw);
+   afqmc.walk(1);
+ 
    return 0;
 
 }
