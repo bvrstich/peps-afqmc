@@ -35,7 +35,7 @@ int main(int argc,char *argv[]){
    Environment::init(D,D_aux);
 
    //set trotter terms on Heisenberg model
-   double dtau = 0.01;
+   double dtau = 1.0;
 
    Trotter::heisenberg(dtau);
 
@@ -47,7 +47,7 @@ int main(int argc,char *argv[]){
    peps.load(filename);
 
    Walker walker;
-/*
+
    //set the values
    Propagator P;
 
@@ -60,7 +60,7 @@ int main(int argc,char *argv[]){
          complex<double> shift(0.0,0.0);// = walker[i].gVL(k,r);
 
          //set the values
-         P.set(x + shift,0,0);
+         P.set(x + shift,1,1);
 
          //and fill the propagator
          P.fill();
@@ -71,15 +71,15 @@ int main(int argc,char *argv[]){
       //}
 
    walker.normalize();
-*/
+
    Environment::U.fill('H',peps,walker);
    Environment::calc_env('H',peps,walker);
-/*
+
    Environment::U.fill('V',peps,walker);
    Environment::calc_env('V',peps,walker);
 
    Environment::test_env();
-*/
+
 /*
    walker.calc_properties('H',peps);
 

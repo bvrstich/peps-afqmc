@@ -485,8 +485,6 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
    //initial guess by performing svd compression of uncanonicalized state: output is right-canonicalized state
    guess(Right,Dc,mps);
 
-   cout << this->dotc(mps) << endl;
-
    //construct renormalized operators
    std::vector< TArray<complex<double>,2> > RO(L - 1);
    std::vector< TArray<complex<double>,2> > LO(L - 1);
@@ -495,7 +493,7 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
    int iter = 0;
 
-//   while(iter < n_iter){
+   while(iter < n_iter){
 
       //first site
       int M = mps[0].shape(1);
@@ -503,7 +501,7 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
       int K = mps[0].shape(2);
 
       blas::gemm(CblasRowMajor,CblasNoTrans,CblasConjTrans, M, N, K, one, mps[0].data(),K,RO[0].data(),K,zero,(*this)[0].data(),N);
-/*
+
       //QR
       Geqrf((*this)[0],RO[0]);
 
@@ -582,43 +580,43 @@ void MPS::compress(int Dc,const MPS &mps,int n_iter){
 
       for(int i = L - 2;i > 0;--i){
 
-      M = mps[i].shape(0) * mps[i].shape(1);
-      N = RO[i].shape(0);
-      K = RO[i].shape(1);
+         M = mps[i].shape(0) * mps[i].shape(1);
+         N = RO[i].shape(0);
+         K = RO[i].shape(1);
 
-      tmp.resize(shape(mps[i].shape(0),mps[i].shape(1),N));
+         tmp.resize(shape(mps[i].shape(0),mps[i].shape(1),N));
 
-      blas::gemm(CblasRowMajor,CblasNoTrans,CblasConjTrans, M, N, K, one, mps[i].data(),K,RO[i].data(),K,zero,tmp.data(),N);
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasConjTrans, M, N, K, one, mps[i].data(),K,RO[i].data(),K,zero,tmp.data(),N);
 
-      M = LO[i-1].shape(0);
-      N = tmp.shape(1)*tmp.shape(2);
-      K = tmp.shape(0);
+         M = LO[i-1].shape(0);
+         N = tmp.shape(1)*tmp.shape(2);
+         K = tmp.shape(0);
 
-      (*this)[i].resize(shape(LO[i-1].shape(0),mps[i].shape(1),RO[i].shape(0)));
+         (*this)[i].resize(shape(LO[i-1].shape(0),mps[i].shape(1),RO[i].shape(0)));
 
-      blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, LO[i-1].data(),K,tmp.data(),N,zero,(*this)[i].data(),N);
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, LO[i-1].data(),K,tmp.data(),N,zero,(*this)[i].data(),N);
 
-      Gelqf(LO[i],(*this)[i]);
+         Gelqf(LO[i],(*this)[i]);
 
-      //paste to previous matrix
-      M = (*this)[i-1].shape(0)*(*this)[i-1].shape(1);
-      N = LO[i].shape(1);
-      K = LO[i].shape(0);
+         //paste to previous matrix
+         M = (*this)[i-1].shape(0)*(*this)[i-1].shape(1);
+         N = LO[i].shape(1);
+         K = LO[i].shape(0);
 
-      tmp.resize(shape((*this)[i-1].shape(0),(*this)[i-1].shape(1),N));
+         tmp.resize(shape((*this)[i-1].shape(0),(*this)[i-1].shape(1),N));
 
-      blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, (*this)[i-1].data(),K,LO[i].data(),N,zero,tmp.data(),N);
+         blas::gemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, K, one, (*this)[i-1].data(),K,LO[i].data(),N,zero,tmp.data(),N);
 
-      (*this)[i-1] = std::move(tmp);
+         (*this)[i-1] = std::move(tmp);
 
-      compress::update_R(i,RO,mps,*this);
+         compress::update_R(i,RO,mps,*this);
 
-           }
+      }
 
       ++iter;
 
    }
-*/
+
    this->D = Dc;
 
 }
