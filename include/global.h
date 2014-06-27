@@ -13,6 +13,7 @@ using std::complex;
 using namespace btas;
 
 #include "PEPS.h"
+#include "Walker.h"
 
 namespace global {
 
@@ -42,6 +43,9 @@ namespace global {
    //!number of threads in the program: for openmp
    extern int omp_num_threads;
 
+   //!backup the walker for stability: if jump is too large copy back original one...
+   extern std::vector< Walker > backup_walker;
+
    //!intermediate storage for calculation of auxiliary operator expectation values
    extern vector< vector< vector< complex<double> > > > auxvec;
 
@@ -51,6 +55,9 @@ namespace global {
 
    template<typename T>
       T rgen();
+
+   template<typename T>
+      T rgen_pos();
    
    //!eigenvector of Sx |Sx><Sx|
    extern std::vector< TArray<complex<double>,2> > Mx;

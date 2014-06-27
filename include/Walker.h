@@ -53,6 +53,8 @@ class Walker : public vector< TArray<complex<double>,1> > {
 
       void propagate(const Propagator &);
 
+      void copy_essential(const Walker &);
+
   private:
 
       //!The walker weight

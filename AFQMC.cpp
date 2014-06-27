@@ -72,6 +72,8 @@ void AFQMC::walk(const int steps){
 
       //Propagate the walkers of each rank separately
       double wsum;
+
+      complex<double> prev_EP = EP;
       
       if(step % 2 == 0)
          wsum = propagate('H');
@@ -96,18 +98,18 @@ void AFQMC::walk(const int steps){
       cout << "---------------------------------------------------------" << endl;
 #endif
 
-      write(step,std::real(EP), ET);
+      write(step,0.5 * std::real(EP + prev_EP), ET);
 
       //Based on scaling, first control the population on each rank separately, and then balance the population over the ranks (uses MPI)
       PopulationControl(scaling);
 
-      double min_en = 0.0;
+      double max_ov = 0.0;
       double min_ov = 1.0;
 
       for(int i = 0;i < walker.size();++i){
-
-         if(min_en > std::real(walker[i].gEL()))
-            min_en = std::real(walker[i].gEL());
+         
+         if(max_ov < std::abs(walker[i].gOverlap()))
+            max_ov = std::abs(walker[i].gOverlap());
 
          if(min_ov > std::abs(walker[i].gOverlap()))
             min_ov = std::abs(walker[i].gOverlap());
@@ -115,8 +117,8 @@ void AFQMC::walk(const int steps){
       }
 
 #ifdef _DEBUG
-      cout << "Minimal Energy:\t" << min_en << endl;
       cout << "Minimal Overlap:\t" << min_ov << endl;
+      cout << "Maximal Overlap:\t" << max_ov << endl;
 #endif
 
    }
@@ -131,7 +133,11 @@ double AFQMC::propagate(char option){
 
    double sum = 0.0;
 
-#pragma omp parallel for reduction(+: sum)
+   double width = sqrt(2.0/Trotter::dtau);
+
+   int num_rej = 0;
+
+#pragma omp parallel for reduction(+: sum,num_rej)
    for(int i = 0;i < walker.size();i++){
 
 #ifdef _OPENMP
@@ -139,6 +145,9 @@ double AFQMC::propagate(char option){
 #else
       int myID = 0;
 #endif
+
+      //backup the walker for stability
+      backup_walker[myID].copy_essential(walker[i]);
 
       //now loop over the auxiliary fields:
       for(int k = 0;k < Trotter::n_trot;++k)
@@ -169,16 +178,28 @@ double AFQMC::propagate(char option){
       //horizontal or vertical energy depending on iteration: (for speed reasons)
       walker[i].calc_properties(option,peps);
 
-      complex<double> overlap = walker[i].gOverlap();
       complex<double> EL = walker[i].gEL();
+      complex<double> overlap = walker[i].gOverlap();
 
-      //energy term for weight importance sampling
-      double scale = exp( - Trotter::dtau * std::real(walker[i].gEL() + prev_EL));
+      if( (std::real(EL) < std::real(prev_EL) - width) || (std::real(EL) > std::real(prev_EL) + width) ){//very rare event, will cause numerical unstability
 
-      //phase free projection
-      scale *= std::max(0.0,cos(std::arg(overlap/prev_overlap)));
+         num_rej++;
 
-      walker[i].multWeight(scale);
+         //copy the state back!
+         walker[i].copy_essential(backup_walker[myID]);
+
+      }
+      else{
+
+         //energy term for weight importance sampling
+         double scale = exp( - Trotter::dtau * std::real(EL + prev_EL));
+
+         //phase free projection
+         scale *= std::max(0.0,cos(std::arg(overlap/prev_overlap)));
+
+         walker[i].multWeight(scale);
+
+      }
 
       sum += walker[i].gWeight();
 
@@ -212,7 +233,7 @@ void AFQMC::PopulationControl(double scaling){
 
       if (weight < 0.25){ //Energy doesn't change statistically
 
-         int nCopies = (int) ( weight + rgen<double>());
+         int nCopies = (int) ( weight + rgen_pos<double>());
 
          if(nCopies == 0){
 
@@ -230,7 +251,7 @@ void AFQMC::PopulationControl(double scaling){
 
       if(weight > 1.5){ //statically energy doesn't change
 
-         int nCopies =(int) ( weight + rgen<double>());
+         int nCopies =(int) ( weight + rgen_pos<double>());
          double new_weight = weight / (double) nCopies;
 
          walker[i].sWeight(new_weight);
@@ -300,7 +321,7 @@ void AFQMC::write(const int step,const double EP, const double ET){
 
    ofstream output(filename,ios::app);
    output.precision(16);
-   output << step << "\t\t" << walker.size() << "\t" << EP*2 << "\t\t" << ET << endl;
+   output << step << "\t\t" << walker.size() << "\t" << EP << "\t\t" << ET << endl;
    output.close();
 
 }

@@ -38,11 +38,11 @@ int main(int argc,char *argv[]){
 
    Trotter::heisenberg(dtau);
 
-   int Nw = 512;
+   int Nw = 1024;
 
    AFQMC afqmc(Nw);
    afqmc.walk(1000000);
- 
+
    return 0;
 
 }

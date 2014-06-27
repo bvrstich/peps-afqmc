@@ -1427,3 +1427,22 @@ void Walker::normalize(){
    }
 
 }
+
+
+/**
+ * copy the necessary information of a Walker object into this
+ * @param walker_copy input Walker
+ */
+void Walker::copy_essential(const Walker &walker_copy){
+
+   EL = walker_copy.gEL();
+
+   overlap = walker_copy.gOverlap();
+   weight = walker_copy.gWeight();
+
+   VL = walker_copy.gVL();
+
+   for(int i = 0;i < walker_copy.size();++i)
+      blas::copy(d, walker_copy[i].data(), 1, (*this)[i].data(), 1);
+
+}

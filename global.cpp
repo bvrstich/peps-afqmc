@@ -29,6 +29,8 @@ namespace global{
 
    std::vector< TArray<complex<double>,2> > Mz;
 
+   std::vector< Walker > backup_walker;
+
    PEPS< complex<double> > peps;
 
    int DT;
@@ -154,6 +156,8 @@ namespace global{
       peps.load(filename);
       peps.sD(DT_in);
 
+      backup_walker.resize(omp_num_threads);
+
    }
 
    //!function which generates random complex numbers uniformly on a square of side 2
@@ -169,6 +173,14 @@ namespace global{
       double rgen(){ 
 
          return 2.0*RN() - 1.0;
+
+      }
+
+   //!function which generates uniform random numbers between [-1:1]
+   template<>
+      double rgen_pos(){ 
+
+         return RN();
 
       }
 
